@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:who_that_pokemon/pokemon.dart';
+import 'package:whos_that_pokemon/pokemon.dart';
 import 'dart:math';
 import 'dart:convert';
 

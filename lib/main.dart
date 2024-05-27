@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:who_that_pokemon/whos_that_pokemon.dart';
+import 'package:whos_that_pokemon/whos_that_pokemon.dart';
 
 void main() {
   runApp(const MyApp());

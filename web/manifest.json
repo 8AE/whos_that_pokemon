@@ -1,6 +1,6 @@
 {
-    "name": "who_that_pokemon",
-    "short_name": "who_that_pokemon",
+    "name": "whos_that_pokemon",
+    "short_name": "whos_that_pokemon",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
