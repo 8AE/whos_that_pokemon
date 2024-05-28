@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:whos_that_pokemon/pokemon.dart';
+import 'package:whos_that_pokemon/widgets/pokemon_type.dart';
 import 'dart:math';
 import 'dart:convert';
 
@@ -24,8 +25,8 @@ class WhosThatPokemon extends StatefulWidget {
 
 class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
   String _pokemonName = '';
-  String _pokemonType1 = '';
-  String _pokemonType2 = '';
+  String _pokemonType1 = 'single_type';
+  String _pokemonType2 = 'single_type';
   String _pokemonImageUrl = 'https://picsum.photos/250?image=9';
 
   Future<http.Response> _getRandomPokemonRaw() {
@@ -34,7 +35,7 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
     return http.get(Uri.parse('https://pokeapi.co/api/v2/pokemon/$intValue'));
   }
 
-  Future<void> _incrementCounter() async {
+  Future<void> _generatePokemon() async {
     var data = await _getRandomPokemonRaw();
     Pokemon randomPokemon = Pokemon.fromHttpBody(data.body);
 
@@ -48,36 +49,23 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              "Who's that pokemon?",
-              style: Theme.of(context).textTheme.headlineLarge,
-            ),
-            Text(
-              _pokemonName,
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            Text(
-              _pokemonType1,
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            Text(
-              _pokemonType2,
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            Image.network(_pokemonImageUrl),
-          ],
-        ),
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            "Who's that pokemon?",
+            style: Theme.of(context).textTheme.headlineLarge,
+          ),
+          Text(
+            _pokemonName,
+            style: Theme.of(context).textTheme.headlineMedium,
+          ),
+          PokemonType(_pokemonType1, _pokemonType2),
+          Image.network(_pokemonImageUrl),
+          TextButton(onPressed: _generatePokemon, child: const Text("Generate New Pokemon"))
+        ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
