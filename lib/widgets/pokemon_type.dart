@@ -8,7 +8,7 @@ class PokemonType extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<Widget> children = [
-      const Text("Types:"),
+      Text("Types:", style: Theme.of(context).textTheme.headlineMedium),
     ];
 
     if (_type1 != 'single_type') {
@@ -18,7 +18,7 @@ class PokemonType extends StatelessWidget {
       children.add(Image.asset('assets/type_icons/$_type2.png'));
     }
 
-    return Row(
+    return Wrap(
       children: children,
     );
   }
