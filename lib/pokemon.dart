@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'dart:convert';
 
 class Pokemon {
@@ -28,7 +27,6 @@ class Pokemon {
 
   factory Pokemon.fromHttpBody(String body) {
     var jsonData = jsonDecode(body);
-    // print(jsonData['name']);
 
     String name = jsonData['name'];
     String type1 = jsonData['types'][0]['type']['name'];
