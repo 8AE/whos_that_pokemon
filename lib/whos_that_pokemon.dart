@@ -115,32 +115,32 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
                                 children = [
                                   Text(
                                     "Who's that pokemon?",
-                                    style: Theme.of(context).textTheme.headlineLarge,
+                                    style: Theme.of(context).textTheme.headlineMedium,
                                   ),
                                   PokemonType(snapshot.data!.type1, snapshot.data!.type2),
                                   Text(
                                     'HP: ${snapshot.data!.hp}',
-                                    style: Theme.of(context).textTheme.headlineMedium,
+                                    style: Theme.of(context).textTheme.bodySmall,
                                   ),
                                   Text(
                                     'Attack: ${snapshot.data!.attack}',
-                                    style: Theme.of(context).textTheme.headlineMedium,
+                                    style: Theme.of(context).textTheme.bodySmall,
                                   ),
                                   Text(
-                                    'Defense: ${snapshot.data!.attack}',
-                                    style: Theme.of(context).textTheme.headlineMedium,
+                                    'Defense: ${snapshot.data!.defense}',
+                                    style: Theme.of(context).textTheme.bodySmall,
                                   ),
                                   Text(
                                     'Special Attack: ${snapshot.data!.specialAttack}',
-                                    style: Theme.of(context).textTheme.headlineMedium,
+                                    style: Theme.of(context).textTheme.bodySmall,
                                   ),
                                   Text(
                                     'Special Defense: ${snapshot.data!.specialDefense}',
-                                    style: Theme.of(context).textTheme.headlineMedium,
+                                    style: Theme.of(context).textTheme.bodySmall,
                                   ),
                                   Text(
                                     'Speed: ${snapshot.data!.speed}',
-                                    style: Theme.of(context).textTheme.headlineMedium,
+                                    style: Theme.of(context).textTheme.bodySmall,
                                   ),
                                 ];
                               } else {

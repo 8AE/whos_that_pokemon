@@ -16,7 +16,7 @@ class PokemonGuess extends StatelessWidget {
           Image.network(pokemon.spriteImageUrl),
           Text(
             pokemon.name,
-            style: Theme.of(context).textTheme.headlineMedium,
+            style: Theme.of(context).textTheme.bodyMedium,
           ),
           Padding(padding: EdgeInsets.fromLTRB(10, 0, 0, 0)),
           PokemonType(pokemon.type1, pokemon.type2),

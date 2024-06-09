@@ -8,14 +8,20 @@ class PokemonType extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<Widget> children = [
-      Text("Types:", style: Theme.of(context).textTheme.headlineMedium),
+      Text("Types:", style: Theme.of(context).textTheme.bodySmall),
     ];
 
     if (_type1 != 'single_type') {
-      children.add(Image.asset('assets/type_icons/$_type1.png'));
+      children.add(Image.asset(
+        'assets/type_icons/$_type1.png',
+        width: 100,
+      ));
     }
     if (_type2 != 'single_type') {
-      children.add(Image.asset('assets/type_icons/$_type2.png'));
+      children.add(Image.asset(
+        'assets/type_icons/$_type2.png',
+        width: 100,
+      ));
     }
 
     return Wrap(
