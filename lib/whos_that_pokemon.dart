@@ -1,18 +1,56 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:whos_that_pokemon/pokemon.dart';
 import 'package:whos_that_pokemon/widgets/pokemon_type.dart';
+import 'package:whos_that_pokemon/widgets/pokemon_guess.dart';
 import 'dart:math';
 import 'dart:convert';
 
 class WhosThatPokemon extends StatefulWidget {
-  const WhosThatPokemon({super.key});
+  WhosThatPokemon({super.key});
 
   @override
   State<WhosThatPokemon> createState() => _WhosThatPokemonMainState();
 }
 
 class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
+  final List<Pokemon> pkmnGuessed = [];
+  Pokemon? pokemonToGuess;
+
+  Future<void> _showMyDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Congrats!!!'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                const Text('Yay good job you guessed it right.'),
+                Image.network(
+                  pokemonToGuess!.spriteImageUrl,
+                  width: 100,
+                  height: 100,
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('GG'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<http.Response> _getRandomPokemonRaw() {
     var intValue = Random().nextInt(150) + 1; // only OG for now
 
@@ -22,8 +60,20 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
   Future<Pokemon> _generatePokemon() async {
     var data = await _getRandomPokemonRaw();
     Pokemon randomPokemon = Pokemon.fromHttpBody(data.body);
+    pokemonToGuess ??= randomPokemon;
 
-    return randomPokemon;
+    return pokemonToGuess!;
+  }
+
+  Future<void> _guessPokemon(String name) async {
+    final httpResponse = await http.get(Uri.parse('https://pokeapi.co/api/v2/pokemon/$name'));
+    pkmnGuessed.add(Pokemon.fromHttpBody(httpResponse.body));
+
+    if (name.toLowerCase() == pokemonToGuess!.name.toLowerCase()) {
+      _showMyDialog();
+    }
+
+    setState(() {});
   }
 
   Future<List<String>> _generatePokemonList() async {
@@ -67,13 +117,31 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
                                     "Who's that pokemon?",
                                     style: Theme.of(context).textTheme.headlineLarge,
                                   ),
+                                  PokemonType(snapshot.data!.type1, snapshot.data!.type2),
                                   Text(
-                                    snapshot.data!.name,
+                                    'HP: ${snapshot.data!.hp}',
                                     style: Theme.of(context).textTheme.headlineMedium,
                                   ),
-                                  PokemonType(snapshot.data!.type1, snapshot.data!.type2),
-                                  Image.network(snapshot.data!.spriteImageUrl),
-                                  TextButton(onPressed: _refreshPokemon, child: const Text("Generate New Pokemon"))
+                                  Text(
+                                    'Attack: ${snapshot.data!.attack}',
+                                    style: Theme.of(context).textTheme.headlineMedium,
+                                  ),
+                                  Text(
+                                    'Defense: ${snapshot.data!.attack}',
+                                    style: Theme.of(context).textTheme.headlineMedium,
+                                  ),
+                                  Text(
+                                    'Special Attack: ${snapshot.data!.specialAttack}',
+                                    style: Theme.of(context).textTheme.headlineMedium,
+                                  ),
+                                  Text(
+                                    'Special Defense: ${snapshot.data!.specialDefense}',
+                                    style: Theme.of(context).textTheme.headlineMedium,
+                                  ),
+                                  Text(
+                                    'Speed: ${snapshot.data!.speed}',
+                                    style: Theme.of(context).textTheme.headlineMedium,
+                                  ),
                                 ];
                               } else {
                                 children = [const CircularProgressIndicator()];
@@ -92,9 +160,7 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
                               return name.toLowerCase().contains(textEditingValue.text.toLowerCase());
                             });
                           },
-                          onSelected: (String selection) {
-                            print('You selected: $selection');
-                          },
+                          onSelected: _guessPokemon,
                           fieldViewBuilder:
                               (BuildContext context, TextEditingController textEditingController, FocusNode focusNode, VoidCallback onFieldSubmitted) {
                             return TextField(
@@ -131,6 +197,13 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
                             );
                           },
                         ),
+                        ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: pkmnGuessed.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return PokemonGuess(pkmnGuessed[index]);
+                          },
+                        )
                       ],
                     ),
                   )
@@ -138,40 +211,10 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
               } else {
                 children = [const CircularProgressIndicator()];
               }
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.start,
+              return ListView(
+                // mainAxisAlignment: MainAxisAlignment.start,
                 children: children,
               );
             }));
   }
 }
-
-
-/*
-FutureBuilder<Pokemon>(
-            future: _generatePokemon(),
-            builder: (BuildContext context, AsyncSnapshot<Pokemon> snapshot) {
-              List<Widget> children;
-              if (snapshot.hasData) {
-                children = [
-                  Text(
-                    "Who's that pokemon?",
-                    style: Theme.of(context).textTheme.headlineLarge,
-                  ),
-                  Text(
-                    snapshot.data!.name,
-                    style: Theme.of(context).textTheme.headlineMedium,
-                  ),
-                  PokemonType(snapshot.data!.type1, snapshot.data!.type2),
-                  Image.network(snapshot.data!.spriteImageUrl),
-                  TextButton(onPressed: _refreshPokemon, child: const Text("Generate New Pokemon"))
-                ];
-              } else {
-                children = [const CircularProgressIndicator()];
-              }
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: children,
-              );
-            })
-*/
