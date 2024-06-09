@@ -52,7 +52,7 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
   }
 
   Future<http.Response> _getRandomPokemonRaw() {
-    var intValue = Random().nextInt(150) + 1; // only OG for now
+    var intValue = Random().nextInt(1024) + 1; // only OG for now
 
     return http.get(Uri.parse('https://pokeapi.co/api/v2/pokemon/$intValue'));
   }
@@ -77,7 +77,7 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
   }
 
   Future<List<String>> _generatePokemonList() async {
-    var pokemonListRaw = await http.get(Uri.parse('https://pokeapi.co/api/v2/pokemon?limit=151&offset=0'));
+    var pokemonListRaw = await http.get(Uri.parse('https://pokeapi.co/api/v2/pokemon?limit=1025&offset=0'));
     var jsonData = jsonDecode(pokemonListRaw.body);
     List<String> pkmnList = [];
 
