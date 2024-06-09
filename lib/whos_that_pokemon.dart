@@ -51,6 +51,39 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
     );
   }
 
+  Future<void> _showPokemon() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Congrats!!!'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                const Text('Yay good job you guessed it right.'),
+                Text(pokemonToGuess!.name),
+                Image.network(
+                  pokemonToGuess!.spriteImageUrl,
+                  width: 100,
+                  height: 100,
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('GG'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<http.Response> _getRandomPokemonRaw() {
     var intValue = Random().nextInt(1024) + 1; // only OG for now
 
@@ -142,6 +175,7 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
                                     'Speed: ${snapshot.data!.speed}',
                                     style: Theme.of(context).textTheme.bodySmall,
                                   ),
+                                  ElevatedButton(onPressed: _showPokemon, child: Text('cheeting'))
                                 ];
                               } else {
                                 children = [const CircularProgressIndicator()];
