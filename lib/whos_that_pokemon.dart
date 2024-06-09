@@ -206,7 +206,7 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
                           shrinkWrap: true,
                           itemCount: pkmnGuessed.length,
                           itemBuilder: (BuildContext context, int index) {
-                            return PokemonGuess(pkmnGuessed[index]);
+                            return PokemonGuess(pkmnGuessed[index], pokemonToGuess!);
                           },
                         )
                       ],
