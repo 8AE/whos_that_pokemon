@@ -13,10 +13,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Whos That Pokemon',
-      theme: ThemeData(
-        brightness: Brightness.light,
-        useMaterial3: true,
-      ),
+      theme: ThemeData(brightness: Brightness.light, useMaterial3: true, colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue)),
       darkTheme: ThemeData.dark(useMaterial3: true),
       themeMode: ThemeMode.light,
       home: WhosThatPokemon(),

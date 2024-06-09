@@ -11,16 +11,22 @@ class PokemonGuess extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       height: 100,
-      child: Row(
-        children: [
-          Image.network(pokemon.spriteImageUrl),
-          Text(
-            pokemon.name,
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-          Padding(padding: EdgeInsets.fromLTRB(10, 0, 0, 0)),
-          PokemonType(pokemon.type1, pokemon.type2),
-        ],
+      child: Center(
+        child: ListView(
+          scrollDirection: Axis.horizontal,
+          children: [
+            Image.network(
+              pokemon.spriteImageUrl,
+              height: 100,
+            ),
+            Text(
+              pokemon.name,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            Padding(padding: EdgeInsets.fromLTRB(10, 0, 0, 0)),
+            PokemonType(pokemon.type1, pokemon.type2),
+          ],
+        ),
       ),
     );
   }

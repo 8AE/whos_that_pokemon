@@ -40,8 +40,13 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
           ),
           actions: <Widget>[
             TextButton(
-              child: const Text('GG'),
+              child: const Text('New Pokemon'),
               onPressed: () {
+                setState(() {
+                  pkmnGuessed.clear();
+                  pokemonToGuess = null;
+                });
+
                 Navigator.of(context).pop();
               },
             ),
