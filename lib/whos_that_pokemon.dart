@@ -56,8 +56,46 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
     );
   }
 
+  Future<void> _giveUp() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Booo you suck!!!'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                const Text("Womp Womp you couldn't guess the pokemon"),
+                Text('it was ${pokemonToGuess!.name} btw'),
+                Image.network(
+                  pokemonToGuess!.spriteImageUrl,
+                  width: 100,
+                  height: 100,
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('New Pokemon'),
+              onPressed: () {
+                setState(() {
+                  pkmnGuessed.clear();
+                  pokemonToGuess = null;
+                });
+
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<http.Response> _getRandomPokemonRaw() {
-    var intValue = Random().nextInt(150) + 1; // only OG for now
+    var intValue = Random().nextInt(1024) + 1;
 
     return http.get(Uri.parse('https://pokeapi.co/api/v2/pokemon/$intValue'));
   }
@@ -82,12 +120,11 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
   }
 
   Future<List<String>> _generatePokemonList() async {
-    var pokemonListRaw = await http.get(Uri.parse('https://pokeapi.co/api/v2/pokemon?limit=151&offset=0'));
+    var pokemonListRaw = await http.get(Uri.parse('https://pokeapi.co/api/v2/pokemon?limit=1025&offset=0'));
     var jsonData = jsonDecode(pokemonListRaw.body);
     List<String> pkmnList = [];
 
     for (var pokemonEntry in jsonData['results']) {
-      // var pokemonRaw = await http.get(Uri.parse(pokemonEntry['url']));
       pkmnList.add(pokemonEntry['name']);
     }
 
@@ -122,6 +159,7 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
                                     "Who's that pokemon?",
                                     style: Theme.of(context).textTheme.headlineMedium,
                                   ),
+                                  ElevatedButton(onPressed: _giveUp, child: const Text('Give up :(')),
                                   PokemonType(snapshot.data!.type1, snapshot.data!.type2),
                                   Text(
                                     'HP: ${snapshot.data!.hp}',
