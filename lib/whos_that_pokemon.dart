@@ -127,14 +127,11 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
   Future<http.Response> _getRandomPokemonRawFromGeneration(String generation) {
     var intValue = generationLower[generation]! + Random().nextInt((generationUpper[generation]! + 1) - generationLower[generation]!);
 
-    print(intValue);
-
     return http.get(Uri.parse('https://pokeapi.co/api/v2/pokemon/$intValue'));
   }
 
   Future<Pokemon> _generatePokemon() async {
     var shuffleList = filteredGenList.toList()..shuffle();
-    print(shuffleList);
     var data = await _getRandomPokemonRawFromGeneration(shuffleList.first);
     Pokemon randomPokemon = Pokemon.fromHttpBody(data.body);
     pokemonToGuess ??= randomPokemon;
@@ -252,7 +249,7 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
                               controller: textEditingController,
                               focusNode: focusNode,
                               decoration: InputDecoration(
-                                labelText: 'Search',
+                                labelText: 'Search Pokemon',
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8.0),
                                 ),
