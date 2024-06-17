@@ -13,29 +13,28 @@ class WhosThatPokemon extends StatefulWidget {
   WhosThatPokemon(this.generationMap, {super.key});
 
   @override
-  State<WhosThatPokemon> createState() => _WhosThatPokemonMainState();
+  State<WhosThatPokemon> createState() => _WhosThatPokemonMainState(generationMap);
 }
 
 class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
   late final Map<String, bool> generationMap;
+  late List<String> filteredGenList;
 
-  _WhosThatPokemonMainState() {
-    generationMap = widget.generationMap;
-  }
+  _WhosThatPokemonMainState(this.generationMap);
 
   final List<Pokemon> pkmnGuessed = [];
   Pokemon? pokemonToGuess;
 
   Map<String, int> generationLower = {
     "gen1": 1,
-    "gen2": 152,
-    "gen3": 252,
-    "gen4": 387,
-    "gen5": 494,
-    "gen6": 650,
-    "gen7": 722,
-    "gen8": 810,
-    "gen9": 906,
+    "gen2": 151,
+    "gen3": 251,
+    "gen4": 386,
+    "gen5": 493,
+    "gen6": 649,
+    "gen7": 721,
+    "gen8": 809,
+    "gen9": 905,
   };
 
   Map<String, int> generationUpper = {
@@ -125,14 +124,18 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
     );
   }
 
-  Future<http.Response> _getRandomPokemonRaw() {
-    var intValue = Random().nextInt(1024) + 1;
+  Future<http.Response> _getRandomPokemonRawFromGeneration(String generation) {
+    var intValue = generationLower[generation]! + Random().nextInt((generationUpper[generation]! + 1) - generationLower[generation]!);
+
+    print(intValue);
 
     return http.get(Uri.parse('https://pokeapi.co/api/v2/pokemon/$intValue'));
   }
 
   Future<Pokemon> _generatePokemon() async {
-    var data = await _getRandomPokemonRaw();
+    var shuffleList = filteredGenList.toList()..shuffle();
+    print(shuffleList);
+    var data = await _getRandomPokemonRawFromGeneration(shuffleList.first);
     Pokemon randomPokemon = Pokemon.fromHttpBody(data.body);
     pokemonToGuess ??= randomPokemon;
 
@@ -150,8 +153,9 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
     setState(() {});
   }
 
-  Future<List<String>> _generatePokemonList() async {
-    var pokemonListRaw = await http.get(Uri.parse('https://pokeapi.co/api/v2/pokemon?limit=1025&offset=0'));
+  Future<List<String>> _generatePokemonListWithGen(String generation) async {
+    var pokemonListRaw = await http.get(Uri.parse(
+        'https://pokeapi.co/api/v2/pokemon?limit=${generationUpper[generation]! - generationLower[generation]!}&offset=${generationLower[generation]}'));
     var jsonData = jsonDecode(pokemonListRaw.body);
     List<String> pkmnList = [];
 
@@ -162,8 +166,19 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
     return pkmnList;
   }
 
+  Future<List<String>> _generatePokemonList() async {
+    List<String> pkmnList = [];
+    for (var generation in filteredGenList) {
+      pkmnList.addAll(await _generatePokemonListWithGen(generation));
+    }
+
+    return pkmnList;
+  }
+
   @override
   Widget build(BuildContext context) {
+    filteredGenList = generationMap.entries.where((entry) => entry.value).map((entry) => entry.key).toList();
+
     return Scaffold(
         body: FutureBuilder<List<String>>(
             future: _generatePokemonList(),
