@@ -44,7 +44,7 @@ class StatCompare extends StatelessWidget {
       // width: 50,
       height: 100,
       child: DecoratedBox(
-        decoration: BoxDecoration(color: _colorsBasedOnStatDiff()),
+        decoration: BoxDecoration(color: _colorsBasedOnStatDiff(), borderRadius: BorderRadius.circular(10)),
         child: Padding(
           padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
           child: Text("$statName ${_symbolBasedOnStatDiff()}"),

@@ -131,10 +131,6 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
     return pkmnList;
   }
 
-  Future<void> _refreshPokemon() async {
-    setState(() {});
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:whos_that_pokemon/whos_that_pokemon.dart';
+import 'package:whos_that_pokemon/home_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(brightness: Brightness.light, useMaterial3: true, colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue)),
       darkTheme: ThemeData.dark(useMaterial3: true),
       themeMode: ThemeMode.light,
-      home: WhosThatPokemon(),
+      home: SafeArea(child: HomeScreen()),
     );
   }
 }
