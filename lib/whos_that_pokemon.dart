@@ -9,15 +9,46 @@ import 'dart:math';
 import 'dart:convert';
 
 class WhosThatPokemon extends StatefulWidget {
-  WhosThatPokemon({super.key});
+  late final Map<String, bool> generationMap;
+  WhosThatPokemon(this.generationMap, {super.key});
 
   @override
   State<WhosThatPokemon> createState() => _WhosThatPokemonMainState();
 }
 
 class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
+  late final Map<String, bool> generationMap;
+
+  _WhosThatPokemonMainState() {
+    generationMap = widget.generationMap;
+  }
+
   final List<Pokemon> pkmnGuessed = [];
   Pokemon? pokemonToGuess;
+
+  Map<String, int> generationLower = {
+    "gen1": 1,
+    "gen2": 152,
+    "gen3": 252,
+    "gen4": 387,
+    "gen5": 494,
+    "gen6": 650,
+    "gen7": 722,
+    "gen8": 810,
+    "gen9": 906,
+  };
+
+  Map<String, int> generationUpper = {
+    "gen1": 151,
+    "gen2": 251,
+    "gen3": 386,
+    "gen4": 493,
+    "gen5": 649,
+    "gen6": 721,
+    "gen7": 809,
+    "gen8": 905,
+    "gen9": 1025,
+  };
 
   Future<void> _showMyDialog() async {
     return showDialog<void>(
