@@ -255,6 +255,10 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
                                 ),
                                 prefixIcon: Icon(Icons.search),
                               ),
+                              onSubmitted: (value) {
+                                onFieldSubmitted();
+                                textEditingController.clear();
+                              },
                             );
                           },
                           optionsViewBuilder: (BuildContext context, AutocompleteOnSelected<String> onSelected, Iterable<String> options) {

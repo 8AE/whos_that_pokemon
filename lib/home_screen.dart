@@ -58,11 +58,7 @@ class _HomeScreenMainState extends State<HomeScreen> {
           height: double.infinity,
           child: ListView(
             children: [
-              Text(
-                "Who's that pokemon",
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.headlineMedium,
-              ),
+              Image.asset('otherLogo.png', width: 150, height: 150),
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 10),
                 child: Text("Generation Filters", textAlign: TextAlign.center),
