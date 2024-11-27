@@ -1,6 +1,5 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:whos_that_pokemon/pokemon.dart';
 import 'package:whos_that_pokemon/widgets/pokemon_type.dart';
@@ -172,6 +171,128 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
     return pkmnList;
   }
 
+  _loading() {
+    return const SizedBox(
+      width: 100,
+      height: 100,
+      child: CircularProgressIndicator(
+        color: Colors.purpleAccent,
+      ),
+    );
+  }
+
+  _pokemonData(Pokemon pkmData) {
+    return [
+      Align(
+        alignment: Alignment.topLeft,
+        child: RichText(
+          textAlign: TextAlign.center,
+          text: TextSpan(
+            style: GoogleFonts.inter(
+              fontSize: 40,
+              color: Colors.white,
+            ),
+            children: const [
+              TextSpan(text: "Who's That "),
+              TextSpan(
+                text: "Pokémon",
+                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.purpleAccent),
+              ),
+            ],
+          ),
+        ),
+      ),
+      ElevatedButton(onPressed: _giveUp, child: const Text('Give up :(')),
+      PokemonType(pkmData.type1, pkmData.type2),
+      Text(
+        'HP: ${pkmData.hp}',
+        style: Theme.of(context).textTheme.bodySmall,
+      ),
+      Text(
+        'Attack: ${pkmData.attack}',
+        style: Theme.of(context).textTheme.bodySmall,
+      ),
+      Text(
+        'Defense: ${pkmData.defense}',
+        style: Theme.of(context).textTheme.bodySmall,
+      ),
+      Text(
+        'Special Attack: ${pkmData.specialAttack}',
+        style: Theme.of(context).textTheme.bodySmall,
+      ),
+      Text(
+        'Special Defense: ${pkmData.specialDefense}',
+        style: Theme.of(context).textTheme.bodySmall,
+      ),
+      Text(
+        'Speed: ${pkmData.speed}',
+        style: Theme.of(context).textTheme.bodySmall,
+      ),
+    ];
+  }
+
+  _guessingBox(List<String> pkmNameList) {
+    return Autocomplete<String>(
+      optionsBuilder: (TextEditingValue textEditingValue) {
+        if (textEditingValue.text.isEmpty) {
+          return const Iterable<String>.empty();
+        }
+        return pkmNameList.where((String name) {
+          return name.toLowerCase().contains(textEditingValue.text.toLowerCase());
+        });
+      },
+      onSelected: _guessPokemon,
+      fieldViewBuilder: (BuildContext context, TextEditingController textEditingController, FocusNode focusNode, VoidCallback onFieldSubmitted) {
+        return TextField(
+          controller: textEditingController,
+          focusNode: focusNode,
+          decoration: InputDecoration(
+            labelStyle: GoogleFonts.inter(color: Colors.white),
+            labelText: 'Search Pokémon',
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.0),
+              borderSide: const BorderSide(color: Colors.purpleAccent),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.0),
+              borderSide: const BorderSide(color: Colors.purpleAccent),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.0),
+              borderSide: const BorderSide(color: Colors.purpleAccent),
+            ),
+            prefixIcon: const Icon(Icons.search, color: Colors.purpleAccent),
+          ),
+          onSubmitted: (value) {
+            onFieldSubmitted();
+            textEditingController.clear();
+          },
+        );
+      },
+      optionsViewBuilder: (BuildContext context, AutocompleteOnSelected<String> onSelected, Iterable<String> options) {
+        return Align(
+          alignment: Alignment.topLeft,
+          child: Material(
+            elevation: 4.0,
+            child: ListView(
+              padding: EdgeInsets.all(8.0),
+              children: options.map((String option) {
+                return GestureDetector(
+                  onTap: () {
+                    onSelected(option);
+                  },
+                  child: ListTile(
+                    title: Text(option),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     filteredGenList = generationMap.entries.where((entry) => entry.value).map((entry) => entry.key).toList();
@@ -193,96 +314,16 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
                             builder: (BuildContext context, AsyncSnapshot<Pokemon> snapshot) {
                               List<Widget> children;
                               if (snapshot.hasData) {
-                                children = [
-                                  Text(
-                                    "Who's that pokemon?",
-                                    style: Theme.of(context).textTheme.headlineMedium,
-                                  ),
-                                  ElevatedButton(onPressed: _giveUp, child: const Text('Give up :(')),
-                                  PokemonType(snapshot.data!.type1, snapshot.data!.type2),
-                                  Text(
-                                    'HP: ${snapshot.data!.hp}',
-                                    style: Theme.of(context).textTheme.bodySmall,
-                                  ),
-                                  Text(
-                                    'Attack: ${snapshot.data!.attack}',
-                                    style: Theme.of(context).textTheme.bodySmall,
-                                  ),
-                                  Text(
-                                    'Defense: ${snapshot.data!.defense}',
-                                    style: Theme.of(context).textTheme.bodySmall,
-                                  ),
-                                  Text(
-                                    'Special Attack: ${snapshot.data!.specialAttack}',
-                                    style: Theme.of(context).textTheme.bodySmall,
-                                  ),
-                                  Text(
-                                    'Special Defense: ${snapshot.data!.specialDefense}',
-                                    style: Theme.of(context).textTheme.bodySmall,
-                                  ),
-                                  Text(
-                                    'Speed: ${snapshot.data!.speed}',
-                                    style: Theme.of(context).textTheme.bodySmall,
-                                  ),
-                                ];
+                                children = _pokemonData(snapshot.data!);
                               } else {
-                                children = [const CircularProgressIndicator()];
+                                children = [_loading()];
                               }
                               return Column(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: children,
                               );
                             }),
-                        Autocomplete<String>(
-                          optionsBuilder: (TextEditingValue textEditingValue) {
-                            if (textEditingValue.text.isEmpty) {
-                              return const Iterable<String>.empty();
-                            }
-                            return pkmNameList.where((String name) {
-                              return name.toLowerCase().contains(textEditingValue.text.toLowerCase());
-                            });
-                          },
-                          onSelected: _guessPokemon,
-                          fieldViewBuilder:
-                              (BuildContext context, TextEditingController textEditingController, FocusNode focusNode, VoidCallback onFieldSubmitted) {
-                            return TextField(
-                              controller: textEditingController,
-                              focusNode: focusNode,
-                              decoration: InputDecoration(
-                                labelText: 'Search Pokemon',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                                prefixIcon: Icon(Icons.search),
-                              ),
-                              onSubmitted: (value) {
-                                onFieldSubmitted();
-                                textEditingController.clear();
-                              },
-                            );
-                          },
-                          optionsViewBuilder: (BuildContext context, AutocompleteOnSelected<String> onSelected, Iterable<String> options) {
-                            return Align(
-                              alignment: Alignment.topLeft,
-                              child: Material(
-                                elevation: 4.0,
-                                child: ListView(
-                                  padding: EdgeInsets.all(8.0),
-                                  children: options.map((String option) {
-                                    return GestureDetector(
-                                      onTap: () {
-                                        onSelected(option);
-                                      },
-                                      child: ListTile(
-                                        title: Text(option),
-                                      ),
-                                    );
-                                  }).toList(),
-                                ),
-                              ),
-                            );
-                          },
-                        ),
+                        _guessingBox(pkmNameList),
                         ListView.builder(
                           shrinkWrap: true,
                           itemCount: pkmnGuessed.length,
@@ -295,7 +336,7 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
                   )
                 ];
               } else {
-                children = [const CircularProgressIndicator()];
+                children = [_loading()];
               }
               return ListView(
                 // mainAxisAlignment: MainAxisAlignment.start,
