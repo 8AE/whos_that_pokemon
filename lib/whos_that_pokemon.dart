@@ -676,10 +676,16 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
       drawer: Drawer(
         child: Column(
           children: [
-            _statBox(),
-            const SizedBox(height: 10),
-            GenerationSelector(
-              generationMap: generationMap,
+            Expanded(
+              child: ListView(
+                children: [
+                  _statBox(),
+                  const SizedBox(height: 10),
+                  GenerationSelector(
+                    generationMap: generationMap,
+                  ),
+                ],
+              ),
             ),
           ],
         ),

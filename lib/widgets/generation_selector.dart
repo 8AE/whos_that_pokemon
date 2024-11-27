@@ -122,6 +122,7 @@ class GenerationSelectorMainState extends State<GenerationSelector> {
                 const SizedBox(height: 10),
                 ListView(
                   shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
                   children: widget.generationMap.keys.map((generation) {
                     return Container(
                       decoration: BoxDecoration(
