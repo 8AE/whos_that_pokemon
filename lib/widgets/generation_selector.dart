@@ -65,7 +65,7 @@ class GenerationSelectorMainState extends State<GenerationSelector> {
                 Navigator.of(context).pop();
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
-                    builder: (context) => WhosThatPokemon(newGenerationMap),
+                    builder: (context) => WhosThatPokemon(newGenerationMap, 0),
                   ),
                 );
               },

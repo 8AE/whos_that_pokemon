@@ -114,7 +114,7 @@ class _HomeScreenMainState extends State<HomeScreen> {
           } else {
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => WhosThatPokemon(generationMap),
+                builder: (context) => WhosThatPokemon(generationMap, 0),
               ),
             );
           }
