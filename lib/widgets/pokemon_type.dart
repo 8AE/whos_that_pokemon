@@ -7,9 +7,7 @@ class PokemonType extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> children = [
-      Text("Types:", style: Theme.of(context).textTheme.bodySmall),
-    ];
+    List<Widget> children = [];
 
     if (_type1 != 'single_type') {
       children.add(Image.asset(
