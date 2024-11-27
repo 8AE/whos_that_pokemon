@@ -24,6 +24,7 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
 
   int currentHp = 100;
   int score = 0;
+  bool _showInfo = true;
 
   final _currentGuessesToPointsGained = {
     1: 5,
@@ -380,64 +381,79 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
   }
 
   _guessingBox(List<String> pkmNameList) {
-    return Autocomplete<String>(
-      optionsBuilder: (TextEditingValue textEditingValue) {
-        if (textEditingValue.text.isEmpty) {
-          return const Iterable<String>.empty();
+    return Focus(
+      onFocusChange: (hasFocus) {
+        if (hasFocus) {
+          setState(() {
+            // Add padding when the box is focused
+            _showInfo = false;
+          });
+        } else {
+          setState(() {
+            // Remove padding when the box is not focused
+            _showInfo = true;
+          });
         }
-        return pkmNameList.where((String name) {
-          return name.toLowerCase().contains(textEditingValue.text.toLowerCase());
-        });
       },
-      onSelected: _guessPokemon,
-      fieldViewBuilder: (BuildContext context, TextEditingController textEditingController, FocusNode focusNode, VoidCallback onFieldSubmitted) {
-        return TextField(
-          controller: textEditingController,
-          focusNode: focusNode,
-          decoration: InputDecoration(
-            labelStyle: GoogleFonts.inter(color: Colors.white),
-            labelText: 'Search Pokémon',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.0),
-              borderSide: const BorderSide(color: Colors.purpleAccent),
+      child: Autocomplete<String>(
+        optionsBuilder: (TextEditingValue textEditingValue) {
+          if (textEditingValue.text.isEmpty) {
+            return const Iterable<String>.empty();
+          }
+          return pkmNameList.where((String name) {
+            return name.toLowerCase().contains(textEditingValue.text.toLowerCase());
+          });
+        },
+        onSelected: _guessPokemon,
+        fieldViewBuilder: (BuildContext context, TextEditingController textEditingController, FocusNode focusNode, VoidCallback onFieldSubmitted) {
+          return TextField(
+            controller: textEditingController,
+            focusNode: focusNode,
+            decoration: InputDecoration(
+              labelStyle: GoogleFonts.inter(color: Colors.white),
+              labelText: 'Search Pokémon',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8.0),
+                borderSide: const BorderSide(color: Colors.purpleAccent),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8.0),
+                borderSide: const BorderSide(color: Colors.purpleAccent),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8.0),
+                borderSide: const BorderSide(color: Colors.purpleAccent),
+              ),
+              prefixIcon: const Icon(Icons.search, color: Colors.purpleAccent),
             ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.0),
-              borderSide: const BorderSide(color: Colors.purpleAccent),
+            onSubmitted: (value) {
+              onFieldSubmitted();
+              textEditingController.clear();
+            },
+          );
+        },
+        optionsViewBuilder: (BuildContext context, AutocompleteOnSelected<String> onSelected, Iterable<String> options) {
+          return Align(
+            alignment: Alignment.topLeft,
+            child: Material(
+              elevation: 4.0,
+              child: ListView(
+                padding: const EdgeInsets.all(8.0),
+                children: options.map((String option) {
+                  return GestureDetector(
+                    onTap: () {
+                      onSelected(option);
+                    },
+                    child: ListTile(
+                      title: Text(option),
+                    ),
+                  );
+                }).toList(),
+              ),
             ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.0),
-              borderSide: const BorderSide(color: Colors.purpleAccent),
-            ),
-            prefixIcon: const Icon(Icons.search, color: Colors.purpleAccent),
-          ),
-          onSubmitted: (value) {
-            onFieldSubmitted();
-            textEditingController.clear();
-          },
-        );
-      },
-      optionsViewBuilder: (BuildContext context, AutocompleteOnSelected<String> onSelected, Iterable<String> options) {
-        return Align(
-          alignment: Alignment.topLeft,
-          child: Material(
-            elevation: 4.0,
-            child: ListView(
-              padding: const EdgeInsets.all(8.0),
-              children: options.map((String option) {
-                return GestureDetector(
-                  onTap: () {
-                    onSelected(option);
-                  },
-                  child: ListTile(
-                    title: Text(option),
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 
@@ -752,7 +768,12 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
                                     child: _hpBar(),
                                   ),
                                   const SizedBox(height: 10),
-                                  ..._pokemonData(snapshot.data!)
+                                  Visibility(
+                                    visible: _showInfo,
+                                    child: Column(
+                                      children: _pokemonData(snapshot.data!),
+                                    ),
+                                  )
                                 ];
                               } else {
                                 children = [_loading()];
