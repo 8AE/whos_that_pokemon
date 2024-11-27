@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:whos_that_pokemon/pokemon.dart';
+import 'package:whos_that_pokemon/widgets/generation_selector.dart';
 import 'package:whos_that_pokemon/widgets/pokemon_type.dart';
 import 'package:whos_that_pokemon/widgets/pokemon_guess.dart';
 import 'dart:math';
@@ -183,25 +184,6 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
 
   _pokemonData(Pokemon pkmData) {
     return [
-      Align(
-        alignment: Alignment.topLeft,
-        child: RichText(
-          textAlign: TextAlign.center,
-          text: TextSpan(
-            style: GoogleFonts.inter(
-              fontSize: 40,
-              color: Colors.white,
-            ),
-            children: const [
-              TextSpan(text: "Who's That "),
-              TextSpan(
-                text: "Pokémon",
-                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.purpleAccent),
-              ),
-            ],
-          ),
-        ),
-      ),
       ElevatedButton(onPressed: _giveUp, child: const Text('Give up :(')),
       PokemonType(pkmData.type1, pkmData.type2),
       Text(
@@ -309,28 +291,72 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       children: [
-                        FutureBuilder<Pokemon>(
-                            future: _generatePokemon(),
-                            builder: (BuildContext context, AsyncSnapshot<Pokemon> snapshot) {
-                              List<Widget> children;
-                              if (snapshot.hasData) {
-                                children = _pokemonData(snapshot.data!);
-                              } else {
-                                children = [_loading()];
-                              }
-                              return Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: children,
-                              );
-                            }),
-                        _guessingBox(pkmNameList),
-                        ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: pkmnGuessed.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return PokemonGuess(pkmnGuessed[index], pokemonToGuess!);
-                          },
-                        )
+                        Align(
+                          alignment: Alignment.topLeft,
+                          child: RichText(
+                            textAlign: TextAlign.center,
+                            text: TextSpan(
+                              style: GoogleFonts.inter(
+                                fontSize: 40,
+                                color: Colors.white,
+                              ),
+                              children: const [
+                                TextSpan(text: "Who's That "),
+                                TextSpan(
+                                  text: "Pokémon",
+                                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.purpleAccent),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            GenerationSelector(),
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  FutureBuilder<Pokemon>(
+                                      future: _generatePokemon(),
+                                      builder: (BuildContext context, AsyncSnapshot<Pokemon> snapshot) {
+                                        List<Widget> children;
+                                        if (snapshot.hasData) {
+                                          children = _pokemonData(snapshot.data!);
+                                        } else {
+                                          children = [_loading()];
+                                        }
+                                        return Column(
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          children: children,
+                                        );
+                                      }),
+                                  _guessingBox(pkmNameList),
+                                  ListView.builder(
+                                    shrinkWrap: true,
+                                    itemCount: pkmnGuessed.length,
+                                    itemBuilder: (BuildContext context, int index) {
+                                      return PokemonGuess(pkmnGuessed[index], pokemonToGuess!);
+                                    },
+                                  )
+                                ],
+                              ),
+                            ),
+                            SizedBox(
+                              width: 300,
+                              child: Text(
+                                'THIS WILL BE SOMETING ELSE',
+                                style: GoogleFonts.inter(
+                                  fontSize: 24,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                   )
@@ -339,7 +365,6 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
                 children = [_loading()];
               }
               return ListView(
-                // mainAxisAlignment: MainAxisAlignment.start,
                 children: children,
               );
             }));
