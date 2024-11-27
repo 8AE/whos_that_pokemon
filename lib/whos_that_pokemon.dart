@@ -22,6 +22,12 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
 
   _WhosThatPokemonMainState(this.generationMap);
 
+  @override
+  void dispose() {
+    // Dispose any controllers or focus nodes if you have any
+    super.dispose();
+  }
+
   final List<Pokemon> pkmnGuessed = [];
   Pokemon? pokemonToGuess;
 
@@ -184,7 +190,6 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
 
   _pokemonData(Pokemon pkmData) {
     return [
-      ElevatedButton(onPressed: _giveUp, child: const Text('Give up :(')),
       PokemonType(pkmData.type1, pkmData.type2),
       Text(
         'HP: ${pkmData.hp}',
@@ -257,7 +262,7 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
           child: Material(
             elevation: 4.0,
             child: ListView(
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               children: options.map((String option) {
                 return GestureDetector(
                   onTap: () {
@@ -275,98 +280,186 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
     );
   }
 
+  _giveupButton() {
+    return SizedBox(
+      width: 110,
+      child: OutlinedButton(
+        style: OutlinedButton.styleFrom(
+          side: const BorderSide(color: Colors.purpleAccent),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+        ),
+        onPressed: () {
+          _giveUp();
+        },
+        child: Text("Give Up", style: GoogleFonts.inter(color: Colors.white)),
+      ),
+    );
+  }
+
+  _statBox() {
+    return SizedBox(
+      width: 300,
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Colors.purpleAccent,
+            width: 2.0,
+          ),
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Column(
+            children: [
+              Text(
+                "Stats",
+                style: GoogleFonts.inter(
+                  fontSize: 24,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: RichText(
+                  text: TextSpan(
+                    style: GoogleFonts.inter(
+                      fontSize: 16,
+                      color: Colors.white,
+                    ),
+                    children: const [
+                      TextSpan(text: "Guessing Tier: "),
+                      TextSpan(
+                        text: "Pokeball",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 5),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Current Guesses: ${pkmnGuessed.length}",
+                  style: GoogleFonts.inter(
+                    fontSize: 16,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 5),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Correct Guesses Streak: 0",
+                  style: GoogleFonts.inter(
+                    fontSize: 16,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 5),
+              _giveupButton(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     filteredGenList = generationMap.entries.where((entry) => entry.value).map((entry) => entry.key).toList();
 
     return Scaffold(
-        body: FutureBuilder<List<String>>(
-            future: _generatePokemonList(),
-            builder: (BuildContext context, AsyncSnapshot<List<String>> snapshot) {
-              List<Widget> children;
-              if (snapshot.hasData) {
-                List<String> pkmNameList = snapshot.data!;
-                children = [
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      children: [
-                        Align(
-                          alignment: Alignment.topLeft,
-                          child: RichText(
-                            textAlign: TextAlign.center,
-                            text: TextSpan(
-                              style: GoogleFonts.inter(
-                                fontSize: 40,
-                                color: Colors.white,
-                              ),
-                              children: const [
-                                TextSpan(text: "Who's That "),
-                                TextSpan(
-                                  text: "Pokémon",
-                                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.purpleAccent),
-                                ),
-                              ],
-                            ),
+      body: FutureBuilder<List<String>>(
+        future: _generatePokemonList(),
+        builder: (BuildContext context, AsyncSnapshot<List<String>> snapshot) {
+          List<Widget> children;
+          if (snapshot.hasData) {
+            List<String> pkmNameList = snapshot.data!;
+            children = [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: RichText(
+                        textAlign: TextAlign.center,
+                        text: TextSpan(
+                          style: GoogleFonts.inter(
+                            fontSize: 40,
+                            color: Colors.white,
                           ),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            GenerationSelector(),
-                            Expanded(
-                              child: Column(
-                                children: [
-                                  FutureBuilder<Pokemon>(
-                                      future: _generatePokemon(),
-                                      builder: (BuildContext context, AsyncSnapshot<Pokemon> snapshot) {
-                                        List<Widget> children;
-                                        if (snapshot.hasData) {
-                                          children = _pokemonData(snapshot.data!);
-                                        } else {
-                                          children = [_loading()];
-                                        }
-                                        return Column(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          children: children,
-                                        );
-                                      }),
-                                  _guessingBox(pkmNameList),
-                                  ListView.builder(
-                                    shrinkWrap: true,
-                                    itemCount: pkmnGuessed.length,
-                                    itemBuilder: (BuildContext context, int index) {
-                                      return PokemonGuess(pkmnGuessed[index], pokemonToGuess!);
-                                    },
-                                  )
-                                ],
-                              ),
-                            ),
-                            SizedBox(
-                              width: 300,
-                              child: Text(
-                                'THIS WILL BE SOMETING ELSE',
-                                style: GoogleFonts.inter(
-                                  fontSize: 24,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
+                          children: const [
+                            TextSpan(text: "Who's That "),
+                            TextSpan(
+                              text: "Pokémon",
+                              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.purpleAccent),
                             ),
                           ],
                         ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        GenerationSelector(
+                          generationMap: generationMap,
+                        ),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              FutureBuilder<Pokemon>(
+                                  future: _generatePokemon(),
+                                  builder: (BuildContext context, AsyncSnapshot<Pokemon> snapshot) {
+                                    List<Widget> children;
+                                    if (snapshot.hasData) {
+                                      children = _pokemonData(snapshot.data!);
+                                    } else {
+                                      children = [_loading()];
+                                    }
+                                    return Column(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: children,
+                                    );
+                                  }),
+                              Padding(padding: const EdgeInsets.all(8.0), child: _guessingBox(pkmNameList)),
+                              ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: pkmnGuessed.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  return PokemonGuess(pkmnGuessed[index], pokemonToGuess!);
+                                },
+                              )
+                            ],
+                          ),
+                        ),
+                        _statBox()
                       ],
                     ),
-                  )
-                ];
-              } else {
-                children = [_loading()];
-              }
-              return ListView(
-                children: children,
-              );
-            }));
+                  ],
+                ),
+              )
+            ];
+          } else {
+            children = [_loading()];
+          }
+          return ListView(
+            children: children,
+          );
+        },
+      ),
+    );
   }
 }
