@@ -101,6 +101,55 @@ class _HomeScreenMainState extends State<HomeScreen> {
     ];
   }
 
+  _infiniteButton() {
+    return SizedBox(
+      width: 200,
+      child: OutlinedButton(
+        style: OutlinedButton.styleFrom(
+          side: const BorderSide(color: Colors.purpleAccent),
+        ),
+        onPressed: () {
+          if (generationMap.values.every((element) => element == false)) {
+            _showMyDialog();
+          } else {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => WhosThatPokemon(generationMap),
+              ),
+            );
+          }
+        },
+        child: Text("Infinite", style: GoogleFonts.inter(color: Colors.white)),
+      ),
+    );
+  }
+
+  _dailyButton() {
+    return SizedBox(
+      width: 200,
+      child: OutlinedButton(
+        style: OutlinedButton.styleFrom(
+          side: const BorderSide(color: Colors.grey),
+        ),
+        onPressed: null,
+        child: Text("Daily", style: GoogleFonts.inter(color: Colors.grey)),
+      ),
+    );
+  }
+
+  _onlineButton() {
+    return SizedBox(
+      width: 200,
+      child: OutlinedButton(
+        style: OutlinedButton.styleFrom(
+          side: const BorderSide(color: Colors.grey),
+        ),
+        onPressed: null,
+        child: Text("Online", style: GoogleFonts.inter(color: Colors.grey)),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -135,72 +184,15 @@ class _HomeScreenMainState extends State<HomeScreen> {
                     const SizedBox(
                       height: 20,
                     ),
-                    SizedBox(
-                      width: 200,
-                      child: OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: Colors.purpleAccent),
-                        ),
-                        onPressed: () {
-                          if (generationMap.values.every((element) => element == false)) {
-                            _showMyDialog();
-                          } else {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => WhosThatPokemon(generationMap),
-                              ),
-                            );
-                          }
-                        },
-                        child: Text("Daily", style: GoogleFonts.inter(color: Colors.white)),
-                      ),
-                    ),
+                    _dailyButton(),
                     const SizedBox(
                       height: 10,
                     ),
-                    SizedBox(
-                      width: 200,
-                      child: OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: Colors.purpleAccent),
-                        ),
-                        onPressed: () {
-                          if (generationMap.values.every((element) => element == false)) {
-                            _showMyDialog();
-                          } else {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => WhosThatPokemon(generationMap),
-                              ),
-                            );
-                          }
-                        },
-                        child: Text("Infinite", style: GoogleFonts.inter(color: Colors.white)),
-                      ),
-                    ),
+                    _infiniteButton(),
                     const SizedBox(
                       height: 10,
                     ),
-                    SizedBox(
-                      width: 200,
-                      child: OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: Colors.purpleAccent),
-                        ),
-                        onPressed: () {
-                          if (generationMap.values.every((element) => element == false)) {
-                            _showMyDialog();
-                          } else {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => WhosThatPokemon(generationMap),
-                              ),
-                            );
-                          }
-                        },
-                        child: Text("Online", style: GoogleFonts.inter(color: Colors.white)),
-                      ),
-                    ),
+                    _onlineButton(),
                   ],
                 ),
               ),
