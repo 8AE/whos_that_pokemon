@@ -23,6 +23,22 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
   late List<String> filteredGenList;
 
   int currentHp = 100;
+  int score = 0;
+
+  final _currentGuessesToPointsGained = {
+    1: 5,
+    2: 4,
+    3: 3,
+    4: 2,
+    5: 1,
+  };
+
+  final _tierBoundry = {
+    0: "Pokeball",
+    10: "Great Ball",
+    25: "Ultra Ball",
+    40: "Master Ball",
+  };
 
   _WhosThatPokemonMainState(this.generationMap);
 
@@ -85,6 +101,7 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
                 setState(() {
                   currentHp = 100;
                   widget.correctGuessStreak++;
+                  score += _currentGuessesToPointsGained[pkmnGuessed.length] ?? 0;
                   pkmnGuessed.clear();
                   pokemonToGuess = null;
                 });
@@ -187,12 +204,14 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
 
           if (currentHp <= 0) {
             _streakBrokenDialog();
+            score = 0;
             widget.correctGuessStreak = 0;
           }
         } else {
           if (widget.correctGuessStreak > 0) {
             _streakBrokenDialog();
           }
+          score = 0;
           widget.correctGuessStreak = 0;
         }
       });
@@ -404,13 +423,24 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
                       fontSize: 16,
                       color: Colors.white,
                     ),
-                    children: const [
-                      TextSpan(text: "Guessing Tier: "),
+                    children: [
+                      TextSpan(text: "Guessing Tier: ", style: GoogleFonts.inter(fontWeight: FontWeight.normal)),
                       TextSpan(
-                        text: "Pokeball",
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        text: _tierBoundry.entries.where((entry) => score >= entry.key).map((entry) => entry.value).last,
+                        style: GoogleFonts.inter(fontWeight: FontWeight.bold),
                       ),
                     ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 5),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Score: $score",
+                  style: GoogleFonts.inter(
+                    fontSize: 16,
+                    color: Colors.white,
                   ),
                 ),
               ),
@@ -596,6 +626,17 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
                                     alignment: Alignment.center,
                                     child: Text(
                                       "Correct Guess Streak: ${widget.correctGuessStreak.toString()}",
+                                      style: GoogleFonts.inter(
+                                        fontSize: 16,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 5),
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      "Score: $score",
                                       style: GoogleFonts.inter(
                                         fontSize: 16,
                                         color: Colors.white,
