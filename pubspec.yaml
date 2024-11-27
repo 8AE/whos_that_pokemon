@@ -37,6 +37,7 @@ dependencies:
   cupertino_icons: ^1.0.6
   http: ^1.2.1
   video_player: ^2.9.2
+  google_fonts: ^6.2.1
 
 dev_dependencies:
   flutter_test:
@@ -79,12 +80,7 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  fonts:
-    - family: AntipastoPro
-      fonts:
-        - asset: fonts/AntipastoPro_trial.ttf
-        - asset: fonts/AntipastoPro-Bold_trial.ttf
-          weight: 700
+  # fonts:
   #   - family: Trajan Pro
   #     fonts:
   #       - asset: fonts/TrajanPro.ttf

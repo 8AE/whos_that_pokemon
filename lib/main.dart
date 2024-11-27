@@ -12,10 +12,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Whos That Pokemon',
-      theme: ThemeData(brightness: Brightness.light, useMaterial3: true, colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue)),
+      title: "Who's That Pokemon",
+      theme: ThemeData(brightness: Brightness.light, useMaterial3: true, colorScheme: ColorScheme.fromSeed(seedColor: Colors.purple)),
       darkTheme: ThemeData.dark(useMaterial3: true),
-      themeMode: ThemeMode.light,
+      themeMode: ThemeMode.dark,
       home: SafeArea(child: HomeScreen()),
     );
   }
