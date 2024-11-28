@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:whos_that_pokemon/items/potion.dart';
+import 'package:whos_that_pokemon/items/usable_item.dart';
 import 'package:whos_that_pokemon/pokemon.dart';
 import 'package:whos_that_pokemon/widgets/generation_selector.dart';
 import 'package:whos_that_pokemon/widgets/pokemon_type.dart';
@@ -22,6 +24,15 @@ class WhosThatPokemon extends StatefulWidget {
 class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
   late final Map<String, bool> generationMap;
   late List<String> filteredGenList;
+
+  List<UsableItem> items = [
+    Potion(),
+    Potion(),
+    Potion(),
+    Potion(),
+    Potion(),
+    Potion(),
+  ];
 
   int currentHp = 100;
   int score = 0;
@@ -77,7 +88,7 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
     "gen9": 1025,
   };
 
-  Future<void> _showMyDialog() async {
+  Future<void> _correctGuess() async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!
@@ -106,6 +117,44 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
                   score += _currentGuessesToPointsGained[pkmnGuessed.length] ?? 0;
                   pkmnGuessed.clear();
                   pokemonToGuess = null;
+                });
+
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _useItem(UsableItem item, int index) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Use ${item.name}?', style: GoogleFonts.inter(color: Colors.purpleAccent)),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(item.description, style: GoogleFonts.inter(color: Colors.white)),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel', style: GoogleFonts.inter(color: Colors.white)),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Use Item', style: GoogleFonts.inter(color: Colors.purpleAccent)),
+              onPressed: () {
+                setState(() {
+                  // currentHp += item.healAmount;
+                  items.removeAt(index);
                 });
 
                 Navigator.of(context).pop();
@@ -212,7 +261,7 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
 
     if (name.toLowerCase() == pokemonToGuess!.name.toLowerCase()) {
       await _addPokemonToGuessedPokedex(pokemonToGuess!);
-      _showMyDialog();
+      _correctGuess();
     } else {
       setState(() {
         if (currentHp > 0) {
@@ -657,6 +706,68 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
     );
   }
 
+  _itemBag() {
+    return SizedBox(
+      width: 300,
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Colors.purpleAccent,
+            width: 2.0,
+          ),
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Column(
+            children: [
+              Text(
+                "Bag",
+                style: GoogleFonts.inter(
+                  fontSize: 24,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 10),
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: items.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    leading: Image.asset(
+                      items[index].imageAssetPath,
+                      width: 50,
+                      height: 50,
+                    ),
+                    title: Text(
+                      items[index].name,
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        color: Colors.white,
+                      ),
+                    ),
+                    onTap: () {
+                      _useItem(items[index], index);
+                    },
+                  );
+                },
+              ),
+              if (items.isEmpty)
+                Text(
+                  "No items",
+                  style: GoogleFonts.inter(
+                    fontSize: 16,
+                    color: Colors.white,
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   _logo() {
     return Align(
       alignment: Alignment.topLeft,
@@ -728,7 +839,13 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
                             ],
                           ),
                         ),
-                        _statBox()
+                        Column(
+                          children: [
+                            _statBox(),
+                            const SizedBox(height: 10),
+                            _itemBag(),
+                          ],
+                        ),
                       ],
                     ),
                   ],
