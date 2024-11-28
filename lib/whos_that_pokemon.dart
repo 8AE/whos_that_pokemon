@@ -6,12 +6,14 @@ import 'package:whos_that_pokemon/widgets/generation_selector.dart';
 import 'package:whos_that_pokemon/widgets/pokemon_type.dart';
 import 'dart:math';
 import 'dart:convert';
+import 'package:sembast/sembast.dart';
 
 class WhosThatPokemon extends StatefulWidget {
+  final Database db;
   late final Map<String, bool> generationMap;
   int correctGuessStreak;
 
-  WhosThatPokemon(this.generationMap, this.correctGuessStreak, {super.key});
+  WhosThatPokemon(this.generationMap, this.correctGuessStreak, this.db, {super.key});
 
   @override
   State<WhosThatPokemon> createState() => _WhosThatPokemonMainState(generationMap);
@@ -191,11 +193,22 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
     return pokemonToGuess!;
   }
 
+  _addPokemonToGuessedPokedex(Pokemon pokemon) async {
+    var store = intMapStoreFactory.store('pokedex');
+    var finder = Finder(filter: Filter.equals('pokemon', pokemon.toString()));
+    var recordSnapshots = await store.find(widget.db, finder: finder);
+
+    if (recordSnapshots.isEmpty) {
+      await store.add(widget.db, {'pokemon': pokemon.toString()});
+    }
+  }
+
   Future<void> _guessPokemon(String name) async {
     final httpResponse = await http.get(Uri.parse('https://pokeapi.co/api/v2/pokemon/$name'));
     pkmnGuessed.add(Pokemon.fromHttpBody(httpResponse.body));
 
     if (name.toLowerCase() == pokemonToGuess!.name.toLowerCase()) {
+      await _addPokemonToGuessedPokedex(pokemonToGuess!);
       _showMyDialog();
     } else {
       setState(() {
@@ -674,6 +687,7 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
                       children: [
                         GenerationSelector(
                           generationMap: generationMap,
+                          db: widget.db,
                         ),
                         Expanded(
                           child: Column(
@@ -729,6 +743,7 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
                   const SizedBox(height: 10),
                   GenerationSelector(
                     generationMap: generationMap,
+                    db: widget.db,
                   ),
                 ],
               ),
@@ -800,8 +815,11 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
                                   const SizedBox(height: 10),
                                   Visibility(
                                     visible: _showInfo,
-                                    child: Column(
-                                      children: _pokemonData(snapshot.data!),
+                                    child: Align(
+                                      alignment: Alignment.center,
+                                      child: Column(
+                                        children: _pokemonData(snapshot.data!),
+                                      ),
                                     ),
                                   )
                                 ];
@@ -839,7 +857,7 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        if (constraints.maxWidth > 600) {
+        if (constraints.maxWidth > 900) {
           return _desktopLayout();
         } else {
           return _mobileLayout();

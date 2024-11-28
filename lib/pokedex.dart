@@ -2,23 +2,39 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:whos_that_pokemon/pokemon.dart';
+import 'package:sembast/sembast.dart';
 
 class Pokedex extends StatefulWidget {
-  Pokedex({super.key});
+  final Database db;
+
+  Pokedex({super.key, required this.db});
 
   @override
   State<Pokedex> createState() => _PokedexMainState();
 }
 
 class _PokedexMainState extends State<Pokedex> {
-  List<Pokemon> pokemonList = [
-    Pokemon('name', 'grass', 'fighting', "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/132.png", 100, 108, 109, 1, 2, 230, 132),
-    Pokemon('name', 'grass', 'fighting', "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/133.png", 100, 108, 109, 1, 2, 230, 133)
-  ];
+  List<Pokemon> pokemonList = [];
 
   @override
   void initState() {
     super.initState();
+
+    var store = intMapStoreFactory.store('pokedex');
+
+    List<Pokemon> newList = [];
+    store.find(widget.db).then((records) {
+      for (var record in records) {
+        var pokemonData = record.value['pokemon'] as String;
+        newList.add(Pokemon.fromString(pokemonData));
+      }
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          pokemonList = List.from(newList);
+        });
+      });
+    });
   }
 
   _pokedexBox(Pokemon pokemon) {
@@ -61,8 +77,9 @@ class _PokedexMainState extends State<Pokedex> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Pokedex', style: GoogleFonts.inter(color: Colors.white)),
-        centerTitle: true,
+        title: Text('Pokédex', style: GoogleFonts.inter(color: Colors.purpleAccent, fontWeight: FontWeight.bold)),
+        centerTitle: false,
+        backgroundColor: Colors.transparent,
       ),
       body: GridView.builder(
         gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
@@ -71,7 +88,7 @@ class _PokedexMainState extends State<Pokedex> {
           crossAxisSpacing: 5,
           mainAxisSpacing: 10,
         ),
-        itemCount: 1026,
+        itemCount: 1025,
         itemBuilder: (context, index) {
           final pokemon = pokemonList.firstWhere(
             (pokemon) => pokemon.id == index + 1,

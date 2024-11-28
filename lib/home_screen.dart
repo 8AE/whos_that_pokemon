@@ -6,9 +6,12 @@ import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:whos_that_pokemon/pokedex.dart';
 import 'package:whos_that_pokemon/whos_that_pokemon.dart';
+import 'package:sembast/sembast.dart';
 
 class HomeScreen extends StatefulWidget {
-  HomeScreen({super.key});
+  final Database db;
+
+  HomeScreen({super.key, required this.db});
 
   @override
   State<HomeScreen> createState() => _HomeScreenMainState();
@@ -59,49 +62,6 @@ class _HomeScreenMainState extends State<HomeScreen> {
     );
   }
 
-  _generationFilter() {
-    return [
-      const Padding(
-        padding: EdgeInsets.symmetric(vertical: 10),
-        child: Text("Generation Filters", textAlign: TextAlign.center),
-      ),
-      SizedBox(
-        width: 500,
-        height: 500,
-        child: GridView.count(
-          // crossAxisSpacing: 1,
-          crossAxisCount: 3,
-          shrinkWrap: false,
-          children: [
-            for (var i = 0; i < 9; i++)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: Center(
-                  child: Container(
-                    width: 150,
-                    height: 80,
-                    child: ToggleButtons(
-                      borderRadius: BorderRadius.circular(10),
-                      onPressed: (int index) {
-                        setState(() {
-                          isSelectedBoolList[i][index] = !isSelectedBoolList[i][index];
-                          generationMap['gen${i + 1}'] = isSelectedBoolList[i][index];
-                        });
-                      },
-                      isSelected: isSelectedBoolList[i],
-                      children: [
-                        Text("Generation ${i + 1}"),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-          ],
-        ),
-      )
-    ];
-  }
-
   _infiniteButton() {
     return SizedBox(
       width: 200,
@@ -115,7 +75,7 @@ class _HomeScreenMainState extends State<HomeScreen> {
           } else {
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => WhosThatPokemon(generationMap, 0),
+                builder: (context) => WhosThatPokemon(generationMap, 0, widget.db),
               ),
             );
           }
@@ -164,12 +124,12 @@ class _HomeScreenMainState extends State<HomeScreen> {
           } else {
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => Pokedex(),
+                builder: (context) => Pokedex(db: widget.db),
               ),
             );
           }
         },
-        child: Text("Pokedex", style: GoogleFonts.inter(color: Colors.white)),
+        child: Text("Pokédex", style: GoogleFonts.inter(color: Colors.white)),
       ),
     );
   }

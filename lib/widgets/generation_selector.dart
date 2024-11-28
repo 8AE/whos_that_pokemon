@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:whos_that_pokemon/whos_that_pokemon.dart';
+import 'package:sembast/sembast.dart';
 
 class GenerationSelector extends StatefulWidget {
+  final Database db;
   final Map<String, bool> generationMap;
 
-  GenerationSelector({super.key, required this.generationMap});
+  GenerationSelector({super.key, required this.generationMap, required this.db});
 
   @override
   State<GenerationSelector> createState() => GenerationSelectorMainState();
@@ -65,7 +67,7 @@ class GenerationSelectorMainState extends State<GenerationSelector> {
                 Navigator.of(context).pop();
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
-                    builder: (context) => WhosThatPokemon(newGenerationMap, 0),
+                    builder: (context) => WhosThatPokemon(newGenerationMap, 0, widget.db),
                   ),
                 );
               },
