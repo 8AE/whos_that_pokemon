@@ -178,7 +178,17 @@ class _HomeScreenMainState extends State<HomeScreen> {
                     ),
                     _onlineButton(),
                     const SizedBox(
-                      height: 10,
+                      height: 5,
+                    ),
+                    const SizedBox(
+                      width: 200,
+                      child: Divider(
+                        color: Colors.purpleAccent,
+                        thickness: 1,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 5,
                     ),
                     _pokedexButton(),
                   ],

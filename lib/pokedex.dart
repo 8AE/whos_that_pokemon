@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:http/http.dart' as http;
 import 'package:whos_that_pokemon/pokemon.dart';
 import 'package:sembast/sembast.dart';
 
@@ -39,15 +38,17 @@ class _PokedexMainState extends State<Pokedex> {
 
   _pokedexBox(Pokemon pokemon) {
     return Container(
-      // width: 100,
-      // height: 50,
       decoration: BoxDecoration(
         color: Colors.grey[800],
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         children: [
-          Image.network(pokemon.spriteImageUrl),
+          Image.network(
+            pokemon.spriteImageUrl,
+            width: 90,
+            height: 90,
+          ),
           Text(pokemon.id.toString(), style: GoogleFonts.inter(color: Colors.white)),
         ],
       ),
@@ -55,18 +56,18 @@ class _PokedexMainState extends State<Pokedex> {
   }
 
   _blankBox(int index) {
-    final pokemon =
-        Pokemon('name', 'grass', 'fighting', "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png", 100, 108, 109, 1, 2, 230, -1);
     return Container(
-      // width: 100,
-      // height: 50,
       decoration: BoxDecoration(
         color: Colors.grey[800],
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         children: [
-          Image.network(pokemon.spriteImageUrl),
+          Image.asset(
+            'assets/no-pokemon.png',
+            width: 90,
+            height: 90,
+          ),
           Text(index.toString(), style: GoogleFonts.inter(color: Colors.white)),
         ],
       ),
