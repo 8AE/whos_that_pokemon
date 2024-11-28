@@ -160,15 +160,26 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
   Future<void> _streakBrokenDialog() async {
     return showDialog<void>(
       context: context,
-      barrierDismissible: true,
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('White Out', style: GoogleFonts.inter(color: Colors.red)),
-          content:
-              Text('Game over! \n Your Hp has reached 0 resulting in your correct guess streak to return to 0', style: GoogleFonts.inter(color: Colors.white)),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Game over! \nYour Hp has reached 0 resulting in your correct guess streak to return to 0', style: GoogleFonts.inter(color: Colors.white)),
+                Text('Also the Pokèmon was ${pokemonToGuess!.name}', style: GoogleFonts.inter(color: Colors.white)),
+                Image.network(
+                  pokemonToGuess!.spriteImageUrl,
+                  width: 100,
+                  height: 100,
+                ),
+              ],
+            ),
+          ),
           actions: <Widget>[
             TextButton(
-              child: Text('Return to Main menu', style: GoogleFonts.inter(color: Colors.purpleAccent)),
+              child: Text('Return to Main menu', style: GoogleFonts.inter(color: Colors.white)),
               onPressed: () {
                 Navigator.of(context).pop();
                 Navigator.of(context).pop();
