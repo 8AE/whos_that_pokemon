@@ -117,46 +117,6 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
     );
   }
 
-  // Future<void> _giveUp() async {
-  //   return showDialog<void>(
-  //     context: context,
-  //     barrierDismissible: false, // user must tap button!
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         title: Text('Booo you suck!!!', style: GoogleFonts.inter(color: Colors.red)),
-  //         content: SingleChildScrollView(
-  //           child: ListBody(
-  //             children: <Widget>[
-  //               Text("Womp Womp you couldn't guess the pokemon", style: GoogleFonts.inter(color: Colors.white)),
-  //               Text('it was ${pokemonToGuess!.name} btw', style: GoogleFonts.inter(color: Colors.white)),
-  //               Image.network(
-  //                 pokemonToGuess!.spriteImageUrl,
-  //                 width: 100,
-  //                 height: 100,
-  //               ),
-  //             ],
-  //           ),
-  //         ),
-  //         actions: <Widget>[
-  //           TextButton(
-  //             child: Text('New Pokemon', style: GoogleFonts.inter(color: Colors.purpleAccent)),
-  //             onPressed: () {
-  //               setState(() {
-  //                 currentHp = 100;
-  //                 widget.correctGuessStreak = 0;
-  //                 pkmnGuessed.clear();
-  //                 pokemonToGuess = null;
-  //               });
-
-  //               Navigator.of(context).pop();
-  //             },
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
-
   Future<void> _streakBrokenDialog() async {
     return showDialog<void>(
       context: context,
@@ -312,11 +272,17 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
     return Row(
       children: [
         Expanded(
-          child: LinearProgressIndicator(
-            value: statValue / 255,
-            backgroundColor: Colors.transparent,
-            color: barColor,
-            minHeight: 10,
+          child: TweenAnimationBuilder<double>(
+            tween: Tween<double>(begin: 0, end: statValue / 255),
+            duration: const Duration(milliseconds: 500),
+            builder: (context, value, child) {
+              return LinearProgressIndicator(
+                value: value,
+                backgroundColor: Colors.transparent,
+                color: barColor,
+                minHeight: 10,
+              );
+            },
           ),
         ),
         const SizedBox(width: 10),
@@ -541,11 +507,17 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
           ),
         ),
         Expanded(
-          child: LinearProgressIndicator(
-            value: currentHp / 100,
-            backgroundColor: Colors.grey,
-            color: Colors.green,
-            minHeight: 10,
+          child: TweenAnimationBuilder<double>(
+            tween: Tween<double>(begin: 0, end: currentHp / 100),
+            duration: const Duration(milliseconds: 500),
+            builder: (context, value, child) {
+              return LinearProgressIndicator(
+                value: value,
+                backgroundColor: Colors.grey,
+                color: currentHp <= 20 ? Colors.red : Colors.green,
+                minHeight: 10,
+              );
+            },
           ),
         ),
         const SizedBox(width: 10),
