@@ -54,7 +54,7 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
   Pokemon? pokemonToGuess;
 
   Map<String, int> generationLower = {
-    "gen1": 1,
+    "gen1": 0,
     "gen2": 151,
     "gen3": 251,
     "gen4": 386,
