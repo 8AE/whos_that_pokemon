@@ -167,8 +167,25 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                Text('Game over! \nYour Hp has reached 0 resulting in your correct guess streak to return to 0', style: GoogleFonts.inter(color: Colors.white)),
-                Text('Also the Pokèmon was ${pokemonToGuess!.name}', style: GoogleFonts.inter(color: Colors.white)),
+                Text('Game Over! \nYour HP has dropped to 0, resetting your correct guess streak.', style: GoogleFonts.inter(color: Colors.white)),
+                Text.rich(
+                  TextSpan(
+                    children: [
+                      TextSpan(
+                        text: 'The Pokémon you were trying to guess was ',
+                        style: GoogleFonts.inter(color: Colors.white),
+                      ),
+                      TextSpan(
+                        text: pokemonToGuess!.name,
+                        style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
+                      TextSpan(
+                        text: '.',
+                        style: GoogleFonts.inter(color: Colors.white),
+                      ),
+                    ],
+                  ),
+                ),
                 Image.network(
                   pokemonToGuess!.spriteImageUrl,
                   width: 100,
