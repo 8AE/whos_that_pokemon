@@ -4,7 +4,6 @@ import 'package:http/http.dart' as http;
 import 'package:whos_that_pokemon/pokemon.dart';
 import 'package:whos_that_pokemon/widgets/generation_selector.dart';
 import 'package:whos_that_pokemon/widgets/pokemon_type.dart';
-import 'package:whos_that_pokemon/widgets/pokemon_guess.dart';
 import 'dart:math';
 import 'dart:convert';
 
@@ -505,6 +504,43 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
     );
   }
 
+  _guessedDataTable() {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: DataTable(
+        columns: [
+          DataColumn(label: Text('Sprite', style: GoogleFonts.inter(color: Colors.white))),
+          DataColumn(label: Text('Name', style: GoogleFonts.inter(color: Colors.white))),
+          DataColumn(label: Text('Type', style: GoogleFonts.inter(color: Colors.white))),
+          DataColumn(label: Text('HP', style: GoogleFonts.inter(color: Colors.white))),
+          DataColumn(label: Text('Attack', style: GoogleFonts.inter(color: Colors.white))),
+          DataColumn(label: Text('Defense', style: GoogleFonts.inter(color: Colors.white))),
+          DataColumn(label: Text('Sp. Atk', style: GoogleFonts.inter(color: Colors.white))),
+          DataColumn(label: Text('Sp. Def', style: GoogleFonts.inter(color: Colors.white))),
+          DataColumn(label: Text('Speed', style: GoogleFonts.inter(color: Colors.white))),
+        ],
+        rows: pkmnGuessed.map((pokemon) {
+          return DataRow(cells: [
+            DataCell(
+              Image.network(
+                pokemon.spriteImageUrl,
+                height: 100,
+              ),
+            ),
+            DataCell(Text(pokemon.name, style: GoogleFonts.inter(color: Colors.white))),
+            DataCell(PokemonType(pokemon.type1, pokemon.type2)),
+            DataCell(Text(pokemon.hp.toString(), style: GoogleFonts.inter(color: Colors.white))),
+            DataCell(Text(pokemon.attack.toString(), style: GoogleFonts.inter(color: Colors.white))),
+            DataCell(Text(pokemon.defense.toString(), style: GoogleFonts.inter(color: Colors.white))),
+            DataCell(Text(pokemon.specialAttack.toString(), style: GoogleFonts.inter(color: Colors.white))),
+            DataCell(Text(pokemon.specialDefense.toString(), style: GoogleFonts.inter(color: Colors.white))),
+            DataCell(Text(pokemon.speed.toString(), style: GoogleFonts.inter(color: Colors.white))),
+          ]);
+        }).toList(),
+      ),
+    );
+  }
+
   _statBox() {
     return SizedBox(
       width: 300,
@@ -659,13 +695,7 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
                                     );
                                   }),
                               Padding(padding: const EdgeInsets.all(8.0), child: _guessingBox(pkmNameList)),
-                              ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: pkmnGuessed.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  return PokemonGuess(pkmnGuessed[index], pokemonToGuess!);
-                                },
-                              )
+                              _guessedDataTable(),
                             ],
                           ),
                         ),
@@ -785,13 +815,7 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
                               );
                             }),
                         Padding(padding: const EdgeInsets.all(8.0), child: _guessingBox(pkmNameList)),
-                        ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: pkmnGuessed.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return PokemonGuess(pkmnGuessed[index], pokemonToGuess!);
-                          },
-                        )
+                        _guessedDataTable(),
                       ],
                     ),
                   ],
