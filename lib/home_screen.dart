@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:whos_that_pokemon/pokedex.dart';
 import 'package:whos_that_pokemon/whos_that_pokemon.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -150,6 +151,29 @@ class _HomeScreenMainState extends State<HomeScreen> {
     );
   }
 
+  _pokedexButton() {
+    return SizedBox(
+      width: 200,
+      child: OutlinedButton(
+        style: OutlinedButton.styleFrom(
+          side: const BorderSide(color: Colors.purpleAccent),
+        ),
+        onPressed: () {
+          if (generationMap.values.every((element) => element == false)) {
+            _showMyDialog();
+          } else {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => Pokedex(),
+              ),
+            );
+          }
+        },
+        child: Text("Pokedex", style: GoogleFonts.inter(color: Colors.white)),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -193,6 +217,10 @@ class _HomeScreenMainState extends State<HomeScreen> {
                       height: 10,
                     ),
                     _onlineButton(),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    _pokedexButton(),
                   ],
                 ),
               ),
