@@ -117,45 +117,45 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
     );
   }
 
-  Future<void> _giveUp() async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Booo you suck!!!', style: GoogleFonts.inter(color: Colors.red)),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text("Womp Womp you couldn't guess the pokemon", style: GoogleFonts.inter(color: Colors.white)),
-                Text('it was ${pokemonToGuess!.name} btw', style: GoogleFonts.inter(color: Colors.white)),
-                Image.network(
-                  pokemonToGuess!.spriteImageUrl,
-                  width: 100,
-                  height: 100,
-                ),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('New Pokemon', style: GoogleFonts.inter(color: Colors.purpleAccent)),
-              onPressed: () {
-                setState(() {
-                  currentHp = 100;
-                  widget.correctGuessStreak = 0;
-                  pkmnGuessed.clear();
-                  pokemonToGuess = null;
-                });
+  // Future<void> _giveUp() async {
+  //   return showDialog<void>(
+  //     context: context,
+  //     barrierDismissible: false, // user must tap button!
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         title: Text('Booo you suck!!!', style: GoogleFonts.inter(color: Colors.red)),
+  //         content: SingleChildScrollView(
+  //           child: ListBody(
+  //             children: <Widget>[
+  //               Text("Womp Womp you couldn't guess the pokemon", style: GoogleFonts.inter(color: Colors.white)),
+  //               Text('it was ${pokemonToGuess!.name} btw', style: GoogleFonts.inter(color: Colors.white)),
+  //               Image.network(
+  //                 pokemonToGuess!.spriteImageUrl,
+  //                 width: 100,
+  //                 height: 100,
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //         actions: <Widget>[
+  //           TextButton(
+  //             child: Text('New Pokemon', style: GoogleFonts.inter(color: Colors.purpleAccent)),
+  //             onPressed: () {
+  //               setState(() {
+  //                 currentHp = 100;
+  //                 widget.correctGuessStreak = 0;
+  //                 pkmnGuessed.clear();
+  //                 pokemonToGuess = null;
+  //               });
 
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
+  //               Navigator.of(context).pop();
+  //             },
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
 
   Future<void> _streakBrokenDialog() async {
     return showDialog<void>(
@@ -164,11 +164,26 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('White Out', style: GoogleFonts.inter(color: Colors.red)),
-          content: Text('Your Hp has reached 0 resulting in your correct guess streak to return to 0', style: GoogleFonts.inter(color: Colors.white)),
+          content:
+              Text('Game over! \n Your Hp has reached 0 resulting in your correct guess streak to return to 0', style: GoogleFonts.inter(color: Colors.white)),
           actions: <Widget>[
             TextButton(
-              child: Text('Ok', style: GoogleFonts.inter(color: Colors.purpleAccent)),
+              child: Text('Return to Main menu', style: GoogleFonts.inter(color: Colors.purpleAccent)),
               onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Retry', style: GoogleFonts.inter(color: Colors.purpleAccent)),
+              onPressed: () {
+                setState(() {
+                  currentHp = 100;
+                  widget.correctGuessStreak = 0;
+                  score = 0;
+                  pkmnGuessed.clear();
+                  pokemonToGuess = null;
+                });
                 Navigator.of(context).pop();
               },
             ),
@@ -480,7 +495,7 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
           ),
         ),
         onPressed: () {
-          _giveUp();
+          _streakBrokenDialog();
         },
         child: Text("Give Up", style: GoogleFonts.inter(color: Colors.white)),
       ),
