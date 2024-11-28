@@ -87,6 +87,16 @@ class GenerationSelectorMainState extends State<GenerationSelector> {
           ),
         ),
         onPressed: () {
+          if (newGenerationMap.values.every((isSelected) => !isSelected)) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('At least one generation must be selected.', style: GoogleFonts.inter(color: Colors.white)),
+                backgroundColor: Colors.red,
+              ),
+            );
+            return;
+          }
+
           if (_selectionHasChanged()) {
             _showMyDialog();
           }
