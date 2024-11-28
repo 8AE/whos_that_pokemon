@@ -1,3 +1,4 @@
+import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
@@ -18,6 +19,7 @@ class WhosThatPokemon extends StatefulWidget {
 }
 
 class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
+  late ConfettiController _controllerConfetti;
   late final Map<String, bool> generationMap;
   late List<String> filteredGenList;
 
@@ -43,9 +45,38 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
   _WhosThatPokemonMainState(this.generationMap);
 
   @override
+  void initState() {
+    super.initState();
+    _controllerConfetti = ConfettiController(duration: const Duration(seconds: 1));
+  }
+
+  @override
   void dispose() {
-    // Dispose any controllers or focus nodes if you have any
     super.dispose();
+    _controllerConfetti.dispose();
+  }
+
+  /// A custom Path to paint stars.
+  Path drawStar(Size size) {
+    // Method to convert degrees to radians
+    double degToRad(double deg) => deg * (pi / 180.0);
+
+    const numberOfPoints = 5;
+    final halfWidth = size.width / 2;
+    final externalRadius = halfWidth;
+    final internalRadius = halfWidth / 2.5;
+    final degreesPerStep = degToRad(360 / numberOfPoints);
+    final halfDegreesPerStep = degreesPerStep / 2;
+    final path = Path();
+    final fullAngle = degToRad(360);
+    path.moveTo(size.width, halfWidth);
+
+    for (double step = 0; step < fullAngle; step += degreesPerStep) {
+      path.lineTo(halfWidth + externalRadius * cos(step), halfWidth + externalRadius * sin(step));
+      path.lineTo(halfWidth + internalRadius * cos(step + halfDegreesPerStep), halfWidth + internalRadius * sin(step + halfDegreesPerStep));
+    }
+    path.close();
+    return path;
   }
 
   final List<Pokemon> pkmnGuessed = [];
@@ -75,23 +106,32 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
     "gen9": 1025,
   };
 
-  Future<void> _showMyDialog() async {
+  Future<void> _showCorrectGuessDialog() async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Congrats!!!', style: GoogleFonts.inter(color: Colors.green)),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text('Yay good job you guessed it right.', style: GoogleFonts.inter(color: Colors.white)),
-                Image.network(
-                  pokemonToGuess!.spriteImageUrl,
-                  width: 100,
-                  height: 100,
+          content: SizedBox(
+            width: 300,
+            height: 150,
+            child: ConfettiWidget(
+              confettiController: _controllerConfetti,
+              createParticlePath: drawStar,
+              blastDirectionality: BlastDirectionality.explosive,
+              child: SingleChildScrollView(
+                child: ListBody(
+                  children: <Widget>[
+                    Text('Yay good job you guessed it right.', style: GoogleFonts.inter(color: Colors.white)),
+                    Image.network(
+                      pokemonToGuess!.spriteImageUrl,
+                      width: 250,
+                      height: 250,
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
           actions: <Widget>[
@@ -196,7 +236,8 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
     pkmnGuessed.add(Pokemon.fromHttpBody(httpResponse.body));
 
     if (name.toLowerCase() == pokemonToGuess!.name.toLowerCase()) {
-      _showMyDialog();
+      _showCorrectGuessDialog();
+      _controllerConfetti.play();
     } else {
       setState(() {
         if (currentHp > 0) {
