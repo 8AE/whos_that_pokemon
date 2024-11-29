@@ -679,7 +679,7 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
   _logo() {
     return LayoutBuilder(
       builder: (context, constraints) {
-        double fontSize = constraints.maxWidth > 900 ? 40 : 30;
+        double fontSize = constraints.maxWidth > 900 ? 40 : 20;
         return Align(
           alignment: Alignment.topLeft,
           child: RichText(
