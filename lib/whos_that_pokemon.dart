@@ -658,24 +658,29 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
   }
 
   _logo() {
-    return Align(
-      alignment: Alignment.topLeft,
-      child: RichText(
-        textAlign: TextAlign.center,
-        text: TextSpan(
-          style: GoogleFonts.inter(
-            fontSize: 40,
-            color: Colors.white,
-          ),
-          children: const [
-            TextSpan(text: "Who's That "),
-            TextSpan(
-              text: "Pokémon",
-              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.purpleAccent),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        double fontSize = constraints.maxWidth > 900 ? 40 : 30;
+        return Align(
+          alignment: Alignment.topLeft,
+          child: RichText(
+            textAlign: TextAlign.center,
+            text: TextSpan(
+              style: GoogleFonts.inter(
+                fontSize: fontSize,
+                color: Colors.white,
+              ),
+              children: const [
+                TextSpan(text: "Who's That "),
+                TextSpan(
+                  text: "Pokémon",
+                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.purpleAccent),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
