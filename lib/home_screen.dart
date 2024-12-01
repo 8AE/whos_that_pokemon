@@ -17,10 +17,27 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenMainState();
 }
 
-class _HomeScreenMainState extends State<HomeScreen> {
+class _HomeScreenMainState extends State<HomeScreen> with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<Color?> _colorAnimation;
+
   @override
   void initState() {
     super.initState();
+    // Create an animation controller
+    _animationController = AnimationController(
+      duration: const Duration(seconds: 3),
+      vsync: this,
+    )..repeat(reverse: true);
+
+    // Create a color tween animation
+    _colorAnimation = ColorTween(
+      begin: Colors.purpleAccent,
+      end: Colors.blue,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    ));
   }
 
   @override
@@ -116,7 +133,7 @@ class _HomeScreenMainState extends State<HomeScreen> {
       width: 200,
       child: OutlinedButton(
         style: OutlinedButton.styleFrom(
-          side: const BorderSide(color: Colors.purpleAccent),
+          side: BorderSide(color: _colorAnimation.value ?? Colors.purpleAccent),
         ),
         onPressed: () {
           if (generationMap.values.every((element) => element == false)) {
@@ -190,7 +207,12 @@ class _HomeScreenMainState extends State<HomeScreen> {
                     const SizedBox(
                       height: 5,
                     ),
-                    _pokedexButton(),
+                    AnimatedBuilder(
+                      animation: _animationController,
+                      builder: (context, child) {
+                        return _pokedexButton();
+                      },
+                    ),
                   ],
                 ),
               ),
