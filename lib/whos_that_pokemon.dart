@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:whos_that_pokemon/items/potion.dart';
@@ -503,22 +504,40 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
           );
         },
         optionsViewBuilder: (BuildContext context, AutocompleteOnSelected<String> onSelected, Iterable<String> options) {
+          final indexToHighlight = AutocompleteHighlightedOption.of(context);
+
           return Align(
             alignment: Alignment.topLeft,
             child: Material(
               elevation: 4.0,
-              child: ListView(
-                padding: const EdgeInsets.all(8.0),
-                children: options.map((String option) {
-                  return GestureDetector(
-                    onTap: () {
-                      onSelected(option);
-                    },
-                    child: ListTile(
-                      title: Text(option),
-                    ),
-                  );
-                }).toList(),
+              child: Shortcuts(
+                shortcuts: <LogicalKeySet, Intent>{
+                  LogicalKeySet(LogicalKeyboardKey.arrowDown): const AutocompleteNextOptionIntent(),
+                  LogicalKeySet(LogicalKeyboardKey.arrowUp): const AutocompletePreviousOptionIntent(),
+                },
+                child: ListView.builder(
+                  padding: const EdgeInsets.all(8.0),
+                  itemCount: options.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    final bool isHighlighted = index == indexToHighlight;
+                    return GestureDetector(
+                      onTap: () {
+                        onSelected(options.elementAt(index));
+                      },
+                      child: Container(
+                        color: isHighlighted ? Colors.purpleAccent.withOpacity(0.5) : null,
+                        child: ListTile(
+                          title: Text(
+                            options.elementAt(index),
+                            style: TextStyle(
+                              color: isHighlighted ? Colors.white : null,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
           );
@@ -769,24 +788,29 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
   }
 
   _logo() {
-    return Align(
-      alignment: Alignment.topLeft,
-      child: RichText(
-        textAlign: TextAlign.center,
-        text: TextSpan(
-          style: GoogleFonts.inter(
-            fontSize: 40,
-            color: Colors.white,
-          ),
-          children: const [
-            TextSpan(text: "Who's That "),
-            TextSpan(
-              text: "Pokémon",
-              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.purpleAccent),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        double fontSize = constraints.maxWidth > 900 ? 40 : 20;
+        return Align(
+          alignment: Alignment.topLeft,
+          child: RichText(
+            textAlign: TextAlign.center,
+            text: TextSpan(
+              style: GoogleFonts.inter(
+                fontSize: fontSize,
+                color: Colors.white,
+              ),
+              children: const [
+                TextSpan(text: "Who's That "),
+                TextSpan(
+                  text: "Pokémon",
+                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.purpleAccent),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
