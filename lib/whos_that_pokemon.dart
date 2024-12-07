@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:whos_that_pokemon/items/potion.dart';
+import 'package:whos_that_pokemon/items/super_potion.dart';
 import 'package:whos_that_pokemon/items/usable_item.dart';
 import 'package:whos_that_pokemon/pokemon.dart';
 import 'package:whos_that_pokemon/widgets/generation_selector.dart';
@@ -11,6 +12,7 @@ import 'dart:math';
 import 'dart:convert';
 import 'package:sembast/sembast.dart';
 
+// ignore: must_be_immutable
 class WhosThatPokemon extends StatefulWidget {
   final Database db;
   late final Map<String, bool> generationMap;
@@ -28,7 +30,7 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
 
   List<UsableItem> items = [
     Potion(),
-    Potion(),
+    SuperPotion(),
     Potion(),
     Potion(),
     Potion(),
@@ -155,6 +157,16 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
               onPressed: () {
                 setState(() {
                   // currentHp += item.healAmount;
+                  switch (item.name) {
+                    case "Potion":
+                      currentHp = (currentHp + 20).clamp(0, 100);
+                      break;
+                    case "Super Potion":
+                      currentHp = (currentHp + 40).clamp(0, 100);
+                      break;
+                    default:
+                      break;
+                  }
                   items.removeAt(index);
                 });
 

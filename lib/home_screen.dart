@@ -62,7 +62,7 @@ class _HomeScreenMainState extends State<HomeScreen> {
     );
   }
 
-  _infiniteButton() {
+  _gauntletButton() {
     return SizedBox(
       width: 200,
       child: OutlinedButton(
@@ -80,7 +80,7 @@ class _HomeScreenMainState extends State<HomeScreen> {
             );
           }
         },
-        child: Text("Infinite", style: GoogleFonts.inter(color: Colors.white)),
+        child: Text("Gauntlet", style: GoogleFonts.inter(color: Colors.white)),
       ),
     );
   }
@@ -172,7 +172,7 @@ class _HomeScreenMainState extends State<HomeScreen> {
                     const SizedBox(
                       height: 10,
                     ),
-                    _infiniteButton(),
+                    _gauntletButton(),
                     const SizedBox(
                       height: 10,
                     ),
