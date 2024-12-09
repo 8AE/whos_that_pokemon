@@ -38,6 +38,7 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
   ];
 
   int currentHp = 100;
+  int currentXp = 0;
   int score = 0;
   bool _showInfo = true;
 
@@ -118,6 +119,7 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
                   currentHp = 100;
                   widget.correctGuessStreak++;
                   score += _currentGuessesToPointsGained[pkmnGuessed.length] ?? 0;
+                  currentXp += score;
                   pkmnGuessed.clear();
                   pokemonToGuess = null;
                 });
@@ -156,7 +158,6 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
               child: Text('Use Item', style: GoogleFonts.inter(color: Colors.purpleAccent)),
               onPressed: () {
                 setState(() {
-                  // currentHp += item.healAmount;
                   switch (item.name) {
                     case "Potion":
                       currentHp = (currentHp + 20).clamp(0, 100);
@@ -231,6 +232,7 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
                   currentHp = 100;
                   widget.correctGuessStreak = 0;
                   score = 0;
+                  currentXp = 0;
                   pkmnGuessed.clear();
                   pokemonToGuess = null;
                 });
@@ -612,6 +614,42 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
     );
   }
 
+  _xpBar() {
+    return Row(
+      children: [
+        Text(
+          'XP: ',
+          style: GoogleFonts.inter(
+            fontSize: 16,
+            color: Colors.white,
+          ),
+        ),
+        Expanded(
+          child: TweenAnimationBuilder<double>(
+            tween: Tween<double>(begin: 0, end: currentXp / 10),
+            duration: const Duration(milliseconds: 500),
+            builder: (context, value, child) {
+              return LinearProgressIndicator(
+                value: value,
+                backgroundColor: Colors.grey,
+                color: Colors.blue,
+                minHeight: 10,
+              );
+            },
+          ),
+        ),
+        const SizedBox(width: 10),
+        Text(
+          '$currentXp/10',
+          style: GoogleFonts.inter(
+            fontSize: 16,
+            color: Colors.white,
+          ),
+        ),
+      ],
+    );
+  }
+
   _guessedDataTable() {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -727,6 +765,10 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
               Align(
                 alignment: Alignment.centerLeft,
                 child: _hpBar(),
+              ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: _xpBar(),
               ),
               const SizedBox(height: 5),
               _giveupButton(),
@@ -979,6 +1021,10 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
                                   Align(
                                     alignment: Alignment.center,
                                     child: _hpBar(),
+                                  ),
+                                  Align(
+                                    alignment: Alignment.center,
+                                    child: _xpBar(),
                                   ),
                                   const SizedBox(height: 10),
                                   Visibility(
