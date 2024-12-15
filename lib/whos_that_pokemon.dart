@@ -31,13 +31,13 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
   late final Map<String, bool> generationMap;
   late List<String> filteredGenList;
 
-  List<UsableItem> items = [
+  List<UsableItem> items = [];
+
+  List<UsableItem> itemsToAdd = [
     Potion(),
     SuperPotion(),
     GenerationDetector(),
     PokedexScope(),
-    Potion(),
-    Potion(),
   ];
 
   int currentHp = 100;
@@ -128,11 +128,16 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
             TextButton(
               child: Text('New Pokemon', style: GoogleFonts.inter(color: Colors.purpleAccent)),
               onPressed: () {
+                final gainedScore = _currentGuessesToPointsGained[pkmnGuessed.length] ?? 0;
                 setState(() {
                   currentHp = 100;
                   widget.correctGuessStreak++;
-                  score += _currentGuessesToPointsGained[pkmnGuessed.length] ?? 0;
-                  currentXp = (currentXp + score) % 10;
+                  score += gainedScore;
+                  currentXp = (currentXp + gainedScore);
+                  if (currentXp >= 10) {
+                    currentXp = currentXp - 10;
+                    items.add(itemsToAdd[Random().nextInt(itemsToAdd.length)]);
+                  }
                   pkmnGuessed.clear();
                   _clearData();
                 });
@@ -254,6 +259,8 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
                   widget.correctGuessStreak = 0;
                   score = 0;
                   currentXp = 0;
+                  items.clear();
+
                   _clearData();
                 });
                 Navigator.of(context).pop();
@@ -276,11 +283,8 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
     var data = await _getRandomPokemonRawFromGeneration(shuffleList.first);
     Pokemon randomPokemon = Pokemon.fromHttpBody(data.body);
 
-    if (pokemonToGuess == null) {
-      pokemonSpecies = await PokemonSpecies.create(randomPokemon.id);
-    }
-
     pokemonToGuess ??= randomPokemon;
+    pokemonSpecies = await PokemonSpecies.create(pokemonToGuess!.id);
 
     return pokemonToGuess!;
   }
@@ -506,6 +510,17 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
           style: GoogleFonts.inter(
             fontSize: 16,
             color: Colors.white,
+          ),
+        ),
+      ),
+      const SizedBox(height: 5),
+      Visibility(
+        visible: true,
+        child: Text(
+          pokemonSpecies!.name,
+          style: GoogleFonts.inter(
+            fontSize: 16,
+            color: Colors.red,
           ),
         ),
       ),
