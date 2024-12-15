@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:whos_that_pokemon/items/generation_detector.dart';
+import 'package:whos_that_pokemon/items/pokedex_scope.dart';
 import 'package:whos_that_pokemon/items/potion.dart';
 import 'package:whos_that_pokemon/items/super_potion.dart';
 import 'package:whos_that_pokemon/items/usable_item.dart';
 import 'package:whos_that_pokemon/pokemon.dart';
+import 'package:whos_that_pokemon/pokemon_species.dart';
 import 'package:whos_that_pokemon/widgets/generation_selector.dart';
 import 'package:whos_that_pokemon/widgets/pokemon_type.dart';
 import 'dart:math';
@@ -31,8 +34,8 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
   List<UsableItem> items = [
     Potion(),
     SuperPotion(),
-    Potion(),
-    Potion(),
+    GenerationDetector(),
+    PokedexScope(),
     Potion(),
     Potion(),
   ];
@@ -41,6 +44,8 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
   int currentXp = 0;
   int score = 0;
   bool _showInfo = true;
+  bool _showGen = false;
+  bool _showPokedexNumber = false;
 
   final _currentGuessesToPointsGained = {
     1: 5,
@@ -67,6 +72,7 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
 
   final List<Pokemon> pkmnGuessed = [];
   Pokemon? pokemonToGuess;
+  PokemonSpecies? pokemonSpecies;
 
   Map<String, int> generationLower = {
     "gen1": 0,
@@ -91,6 +97,13 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
     "gen8": 905,
     "gen9": 1025,
   };
+
+  _clearData() {
+    pkmnGuessed.clear();
+    pokemonToGuess = null;
+    _showGen = false;
+    _showPokedexNumber = false;
+  }
 
   Future<void> _correctGuess() async {
     return showDialog<void>(
@@ -119,9 +132,9 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
                   currentHp = 100;
                   widget.correctGuessStreak++;
                   score += _currentGuessesToPointsGained[pkmnGuessed.length] ?? 0;
-                  currentXp += score;
+                  currentXp = (currentXp + score) % 10;
                   pkmnGuessed.clear();
-                  pokemonToGuess = null;
+                  _clearData();
                 });
 
                 Navigator.of(context).pop();
@@ -164,6 +177,14 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
                       break;
                     case "Super Potion":
                       currentHp = (currentHp + 40).clamp(0, 100);
+                      break;
+
+                    case "Generation Detector":
+                      _showGen = true;
+                      break;
+
+                    case "Pokedex Scope":
+                      _showPokedexNumber = true;
                       break;
                     default:
                       break;
@@ -233,8 +254,7 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
                   widget.correctGuessStreak = 0;
                   score = 0;
                   currentXp = 0;
-                  pkmnGuessed.clear();
-                  pokemonToGuess = null;
+                  _clearData();
                 });
                 Navigator.of(context).pop();
               },
@@ -255,6 +275,11 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
     var shuffleList = filteredGenList.toList()..shuffle();
     var data = await _getRandomPokemonRawFromGeneration(shuffleList.first);
     Pokemon randomPokemon = Pokemon.fromHttpBody(data.body);
+
+    if (pokemonToGuess == null) {
+      pokemonSpecies = await PokemonSpecies.create(randomPokemon.id);
+    }
+
     pokemonToGuess ??= randomPokemon;
 
     return pokemonToGuess!;
@@ -462,6 +487,28 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
       ),
       const SizedBox(height: 5),
       PokemonType(pkmData.type1, pkmData.type2),
+      const SizedBox(height: 5),
+      Visibility(
+        visible: _showGen,
+        child: Text(
+          pokemonSpecies!.generation.replaceAll('-', ' '),
+          style: GoogleFonts.inter(
+            fontSize: 16,
+            color: Colors.white,
+          ),
+        ),
+      ),
+      const SizedBox(height: 5),
+      Visibility(
+        visible: _showPokedexNumber,
+        child: Text(
+          'Pokedex Number: ${pokemonSpecies!.id}',
+          style: GoogleFonts.inter(
+            fontSize: 16,
+            color: Colors.white,
+          ),
+        ),
+      ),
     ];
   }
 
