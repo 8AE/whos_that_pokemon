@@ -26,7 +26,7 @@ jobs:
 
     # Step 4: Build Flutter web app
     - name: Build Flutter web app
-      run: flutter build web --release
+      run: flutter build web --release --base-href="/whos_that_pokemon/"
 
     # Step 5: Deploy to GitHub Pages
     - name: Deploy to GitHub Pages
