@@ -32,7 +32,7 @@ endif
 	git add . && \
 	git commit -m "Deploy Version $(BUILD_VERSION)" && \
 	git branch -M main && \
-	git remote add origin https://$(GITHUB_USER):$(GITHUB_TOKEN)@github.com/$(GITHUB_USER)/$(OUTPUT).git && \
+	git remote add origin https://$(GITHUB_USER):$(shell echo $$GITHUB_TOKEN)@github.com/$(GITHUB_USER)/$(OUTPUT).git && \
 	git push -u -f origin main
 	@echo "✅ Finished deploy: $(GITHUB_REPO)"
 	@echo "🚀 Flutter web URL: https://$(GITHUB_USER).github.io/$(OUTPUT)/"
