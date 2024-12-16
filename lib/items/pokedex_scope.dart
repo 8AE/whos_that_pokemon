@@ -6,7 +6,7 @@ class PokedexScope implements UsableItem {
   @override
   final String description = 'A device that can reveal Pokedex entry of a Pokemon.';
   @override
-  final String imageAssetPath = 'assets/no-pokemon.png';
+  final String imageAssetPath = 'assets/items/pokedex.png';
 
   PokedexScope();
 }

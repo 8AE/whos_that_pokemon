@@ -105,6 +105,38 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
     _showPokedexNumber = false;
   }
 
+  _showItemSelectionDialog() {
+    List<UsableItem> randomItems = List.from(itemsToAdd)..shuffle();
+    randomItems = randomItems.take(3).toList();
+
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Level Up! New Item Earned', style: GoogleFonts.inter(color: Colors.purpleAccent)),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: randomItems.map((item) {
+                return ListTile(
+                  leading: Image.asset(item.imageAssetPath, width: 50, height: 50),
+                  title: Text(item.name, style: GoogleFonts.inter(color: Colors.white)),
+                  subtitle: Text(item.description, style: GoogleFonts.inter(color: Colors.white)),
+                  onTap: () {
+                    setState(() {
+                      items.add(item);
+                    });
+                    Navigator.of(context).pop();
+                  },
+                );
+              }).toList(),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Future<void> _correctGuess() async {
     return showDialog<void>(
       context: context,
@@ -129,20 +161,25 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
               child: Text('New Pokemon', style: GoogleFonts.inter(color: Colors.purpleAccent)),
               onPressed: () {
                 final gainedScore = _currentGuessesToPointsGained[pkmnGuessed.length] ?? 0;
+
+                Navigator.of(context).pop();
+
+                currentXp = (currentXp + gainedScore);
+                if (currentXp >= 10) {
+                  _showItemSelectionDialog();
+                }
+
                 setState(() {
                   currentHp = 100;
                   widget.correctGuessStreak++;
                   score += gainedScore;
-                  currentXp = (currentXp + gainedScore);
+
                   if (currentXp >= 10) {
                     currentXp = currentXp - 10;
-                    items.add(itemsToAdd[Random().nextInt(itemsToAdd.length)]);
                   }
                   pkmnGuessed.clear();
                   _clearData();
                 });
-
-                Navigator.of(context).pop();
               },
             ),
           ],
@@ -515,7 +552,7 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
       ),
       const SizedBox(height: 5),
       Visibility(
-        visible: true,
+        visible: false,
         child: Text(
           pokemonSpecies!.name,
           style: GoogleFonts.inter(
@@ -1012,6 +1049,8 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
               child: ListView(
                 children: [
                   _statBox(),
+                  const SizedBox(height: 10),
+                  _itemBag(),
                   const SizedBox(height: 10),
                   GenerationSelector(
                     generationMap: generationMap,
