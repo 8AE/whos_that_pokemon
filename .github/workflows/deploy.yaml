@@ -19,6 +19,8 @@ jobs:
       uses: subosito/flutter-action@v2
       with:
         flutter-version: 'stable' # Use the stable version of Flutter
+        channel: 'stable'
+        architecture: 'x64'
 
     # Step 3: Install dependencies
     - name: Install dependencies
