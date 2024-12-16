@@ -27,6 +27,8 @@ endif
 	@echo "Deploying to git repository"
 	cd build/web && \
 	git init && \
+	git config user.name "github-actions" && \
+	git config user.email "github-actions@github.com" && \
 	git add . && \
 	git commit -m "Deploy Version $(BUILD_VERSION)" && \
 	git branch -M main && \
