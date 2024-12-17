@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 class Pokemon {
   final String name;
@@ -12,6 +13,8 @@ class Pokemon {
   final int specialDefense;
   final int speed;
   final int id;
+  final String shinySpriteImageUrl;
+  final bool isShiny;
 
   Pokemon(
     this.name,
@@ -25,6 +28,8 @@ class Pokemon {
     this.specialDefense,
     this.speed,
     this.id,
+    this.shinySpriteImageUrl,
+    this.isShiny,
   );
 
   factory Pokemon.fromHttpBody(String body) {
@@ -39,6 +44,9 @@ class Pokemon {
     }
 
     String spriteImageUrl = jsonData['sprites']['front_default'];
+    String shinySpriteImageUrl = jsonData['sprites']['front_shiny'];
+
+    bool isShiny = (Random().nextInt(4096) == 0);
 
     //GOD I LOVE MAKING ASSUMPTIONS!
     int hp = jsonData['stats'][0]['base_stat'];
@@ -49,12 +57,12 @@ class Pokemon {
     int speed = jsonData['stats'][5]['base_stat'];
     int id = jsonData['id'];
 
-    return Pokemon(name, type1, type2, spriteImageUrl, hp, attack, defense, specialAttack, specialDefense, speed, id);
+    return Pokemon(name, type1, type2, spriteImageUrl, hp, attack, defense, specialAttack, specialDefense, speed, id, shinySpriteImageUrl, isShiny);
   }
 
   @override
   String toString() {
-    return 'Pokemon{name: $name, type1: $type1, type2: $type2, spriteImageUrl: $spriteImageUrl, hp: $hp, attack: $attack, defense: $defense, specialAttack: $specialAttack, specialDefense: $specialDefense, speed: $speed, id: $id}';
+    return 'Pokemon{name: $name, type1: $type1, type2: $type2, spriteImageUrl: $spriteImageUrl, hp: $hp, attack: $attack, defense: $defense, specialAttack: $specialAttack, specialDefense: $specialDefense, speed: $speed, id: $id, shinySpriteImageUrl: $shinySpriteImageUrl, isShiny: $isShiny}';
   }
 
   factory Pokemon.fromString(String body) {
@@ -71,6 +79,8 @@ class Pokemon {
     int specialDefense = int.parse(parts[8].split(': ')[1]);
     int speed = int.parse(parts[9].split(': ')[1]);
     int id = int.parse(parts[10].split(': ')[1]);
+    String shinySpriteImageUrl = parts[11].split(': ')[1];
+    bool isShiny = parts[12].split(': ')[1] == 'true';
 
     return Pokemon(
       name,
@@ -84,6 +94,8 @@ class Pokemon {
       specialDefense,
       speed,
       id,
+      shinySpriteImageUrl,
+      isShiny,
     );
   }
 }

@@ -25,7 +25,11 @@ class _PokedexMainState extends State<Pokedex> {
     store.find(widget.db).then((records) {
       for (var record in records) {
         var pokemonData = record.value['pokemon'] as String;
-        newList.add(Pokemon.fromString(pokemonData));
+        try {
+          newList.add(Pokemon.fromString(pokemonData));
+        } catch (e) {
+          continue;
+        }
       }
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -45,7 +49,7 @@ class _PokedexMainState extends State<Pokedex> {
       child: Column(
         children: [
           Image.network(
-            pokemon.spriteImageUrl,
+            pokemon.isShiny ? pokemon.shinySpriteImageUrl : pokemon.spriteImageUrl,
             width: 90,
             height: 90,
           ),
@@ -94,7 +98,20 @@ class _PokedexMainState extends State<Pokedex> {
           final pokemon = pokemonList.firstWhere(
             (pokemon) => pokemon.id == index + 1,
             orElse: () => Pokemon(
-                'name', 'grass', 'fighting', "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png", 100, 108, 109, 1, 2, 230, -1),
+              'name',
+              'grass',
+              'fighting',
+              "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png",
+              100,
+              108,
+              109,
+              1,
+              2,
+              230,
+              -1,
+              "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/132.png",
+              true,
+            ),
           );
           if (pokemon.id != -1) {
             return _pokedexBox(pokemon);
