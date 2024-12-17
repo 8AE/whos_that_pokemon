@@ -149,7 +149,7 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
               children: <Widget>[
                 Text('Yay good job you guessed it right.', style: GoogleFonts.inter(color: Colors.white)),
                 Image.network(
-                  pokemonToGuess!.spriteImageUrl,
+                  pokemonToGuess!.isShiny ? pokemonToGuess!.shinySpriteImageUrl : pokemonToGuess!.spriteImageUrl,
                   width: 100,
                   height: 100,
                 ),
@@ -273,7 +273,7 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
                   ),
                 ),
                 Image.network(
-                  pokemonToGuess!.spriteImageUrl,
+                  pokemonToGuess!.isShiny ? pokemonToGuess!.shinySpriteImageUrl : pokemonToGuess!.spriteImageUrl,
                   width: 100,
                   height: 100,
                 ),
@@ -333,6 +333,9 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
 
     if (recordSnapshots.isEmpty) {
       await store.add(widget.db, {'pokemon': pokemon.toString()});
+    } else if (pokemon.isShiny) {
+      var record = recordSnapshots.first;
+      await store.record(record.key).put(widget.db, {'pokemon': pokemon.toString()});
     }
   }
 
@@ -763,12 +766,13 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
           DataColumn(label: Text('Sp. Atk', style: GoogleFonts.inter(color: Colors.white))),
           DataColumn(label: Text('Sp. Def', style: GoogleFonts.inter(color: Colors.white))),
           DataColumn(label: Text('Speed', style: GoogleFonts.inter(color: Colors.white))),
+          DataColumn(label: Text('Total', style: GoogleFonts.inter(color: Colors.white))),
         ],
         rows: pkmnGuessed.map((pokemon) {
           return DataRow(cells: [
             DataCell(
               Image.network(
-                pokemon.spriteImageUrl,
+                pokemon.isShiny ? pokemon.shinySpriteImageUrl : pokemon.spriteImageUrl,
                 height: 100,
               ),
             ),
@@ -780,6 +784,10 @@ class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
             DataCell(Text(pokemon.specialAttack.toString(), style: GoogleFonts.inter(color: Colors.white))),
             DataCell(Text(pokemon.specialDefense.toString(), style: GoogleFonts.inter(color: Colors.white))),
             DataCell(Text(pokemon.speed.toString(), style: GoogleFonts.inter(color: Colors.white))),
+            DataCell(
+              Text((pokemon.hp + pokemon.attack + pokemon.defense + pokemon.specialAttack + pokemon.specialDefense + pokemon.speed).toString(),
+                  style: GoogleFonts.inter(color: Colors.white)),
+            ),
           ]);
         }).toList(),
       ),
