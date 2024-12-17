@@ -4,6 +4,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:whos_that_pokemon/change_log_screen.dart';
 import 'package:whos_that_pokemon/pokedex.dart';
 import 'package:whos_that_pokemon/whos_that_pokemon.dart';
 import 'package:sembast/sembast.dart';
@@ -134,6 +136,25 @@ class _HomeScreenMainState extends State<HomeScreen> {
     );
   }
 
+  _changelogButton() {
+    return SizedBox(
+      width: 200,
+      child: OutlinedButton(
+        style: OutlinedButton.styleFrom(
+          side: const BorderSide(color: Colors.purpleAccent),
+        ),
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => ChangeLogScreen(),
+            ),
+          );
+        },
+        child: Text("Change Log", style: GoogleFonts.inter(color: Colors.white)),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -165,6 +186,26 @@ class _HomeScreenMainState extends State<HomeScreen> {
                         ],
                       ),
                     ),
+                    FutureBuilder<PackageInfo>(
+                      future: PackageInfo.fromPlatform(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.done) {
+                          if (snapshot.hasData) {
+                            return Text(
+                              'Version: ${snapshot.data!.version}',
+                              style: GoogleFonts.inter(color: Colors.white),
+                            );
+                          } else {
+                            return Text(
+                              'Failed to get version',
+                              style: GoogleFonts.inter(color: Colors.white),
+                            );
+                          }
+                        } else {
+                          return const CircularProgressIndicator();
+                        }
+                      },
+                    ),
                     const SizedBox(
                       height: 20,
                     ),
@@ -191,6 +232,10 @@ class _HomeScreenMainState extends State<HomeScreen> {
                       height: 5,
                     ),
                     _pokedexButton(),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    _changelogButton(),
                   ],
                 ),
               ),
