@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:whos_that_pokemon/pokedex.dart';
 import 'package:whos_that_pokemon/whos_that_pokemon.dart';
 import 'package:sembast/sembast.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends StatefulWidget {
   final Database db;
@@ -163,6 +164,20 @@ class _HomeScreenMainState extends State<HomeScreen> {
                             style: TextStyle(fontWeight: FontWeight.bold, color: Colors.purpleAccent),
                           ),
                         ],
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    const Text("This is a outdated version of the game, please check the latest version on the new github page",
+                        style: TextStyle(color: Colors.red)),
+                    GestureDetector(
+                      onTap: () {
+                        launchUrl(Uri.parse("https://8ae.github.io/whos_that_pokemon/"));
+                      },
+                      child: const Text(
+                        "https://8ae.github.io/whos_that_pokemon/",
+                        style: TextStyle(color: Colors.blue, decoration: TextDecoration.underline),
                       ),
                     ),
                     const SizedBox(
