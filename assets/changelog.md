@@ -1,4 +1,8 @@
 
+## Version 1.1.6
+
+- performance improvement s
+
 ## Version 1.1.5
 
 ### New Features

@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:whos_that_pokemon/home_screen.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast_web/sembast_web.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() async {
   var factory = databaseFactoryWeb;
 
   // Open the database in web cache
   Database db = await factory.openDatabase('pokemon_db');
-  runApp(MyApp(db: db));
+  runApp(ProviderScope(child: MyApp(db: db)));
 }
 
 class MyApp extends StatelessWidget {

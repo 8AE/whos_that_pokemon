@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:whos_that_pokemon/items/generation_detector.dart';
@@ -16,7 +17,7 @@ import 'dart:convert';
 import 'package:sembast/sembast.dart';
 
 // ignore: must_be_immutable
-class WhosThatPokemon extends StatefulWidget {
+class WhosThatPokemon extends ConsumerStatefulWidget {
   final Database db;
   late final Map<String, bool> generationMap;
   int correctGuessStreak;
@@ -24,10 +25,10 @@ class WhosThatPokemon extends StatefulWidget {
   WhosThatPokemon(this.generationMap, this.correctGuessStreak, this.db, {super.key});
 
   @override
-  State<WhosThatPokemon> createState() => _WhosThatPokemonMainState(generationMap);
+  ConsumerState<WhosThatPokemon> createState() => _WhosThatPokemonMainState(generationMap);
 }
 
-class _WhosThatPokemonMainState extends State<WhosThatPokemon> {
+class _WhosThatPokemonMainState extends ConsumerState<WhosThatPokemon> {
   late final Map<String, bool> generationMap;
   late List<String> filteredGenList;
 
