@@ -6,8 +6,6 @@ import 'package:whos_that_pokemon/pokemon.dart';
 import 'package:whos_that_pokemon/providers.dart';
 
 class PokemonGenerator {
-  final Map<String, bool> generationMap;
-
   final Map<String, int> _generationLower = {
     "gen1": 0,
     "gen2": 151,
@@ -32,14 +30,11 @@ class PokemonGenerator {
     "gen9": 1025,
   };
 
-  PokemonGenerator({required this.generationMap});
+  PokemonGenerator();
 
-  changeGenerationMap(Map<String, bool> newGenerationMap) {
-    generationMap.clear();
-    generationMap.addAll(newGenerationMap);
-  }
+  List<String> filteredGenList(WidgetRef ref) {
+    final generationMap = ref.read(generationMapProvider);
 
-  List<String> filteredGenList() {
     return generationMap.entries.where((entry) => entry.value).map((entry) => entry.key).toList();
   }
 
@@ -49,8 +44,8 @@ class PokemonGenerator {
     return http.get(Uri.parse('https://pokeapi.co/api/v2/pokemon/$intValue'));
   }
 
-  generatePokemon(ProviderContainer ref, {int? testPokemonNumber}) async {
-    var shuffleList = filteredGenList().toList()..shuffle();
+  Future<void> generatePokemon(WidgetRef ref, {int? testPokemonNumber}) async {
+    var shuffleList = filteredGenList(ref).toList()..shuffle();
     var data;
 
     if (testPokemonNumber != null) {
@@ -60,7 +55,6 @@ class PokemonGenerator {
     }
 
     Pokemon randomPokemon = Pokemon.fromHttpBody(data.body);
-
-    ref.read(pokemonToGuessProvider.notifier).state = randomPokemon;
+    ref.read(pokemonToGuessProvider.notifier).update((state) => randomPokemon);
   }
 }

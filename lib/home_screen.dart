@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:whos_that_pokemon/change_log_screen.dart';
 import 'package:whos_that_pokemon/pokedex.dart';
+import 'package:whos_that_pokemon/screens/game_screen.dart';
 import 'package:whos_that_pokemon/whos_that_pokemon.dart';
 import 'package:sembast/sembast.dart';
 
@@ -30,7 +31,6 @@ class _HomeScreenMainState extends State<HomeScreen> {
     super.dispose();
   }
 
-  List<List<bool>> isSelectedBoolList = List.generate(9, (_) => [true]);
   Map<String, bool> generationMap = {
     "gen1": true,
     "gen2": true,
@@ -77,7 +77,7 @@ class _HomeScreenMainState extends State<HomeScreen> {
           } else {
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => WhosThatPokemon(generationMap, 0, widget.db),
+                builder: (context) => GameScreen(generationMap, 0, widget.db),
               ),
             );
           }
