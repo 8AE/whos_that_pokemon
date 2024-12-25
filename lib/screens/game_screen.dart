@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,6 +14,8 @@ import 'package:whos_that_pokemon/pokemon/pokemon_generator.dart';
 import 'package:whos_that_pokemon/pokemon_species.dart';
 import 'package:whos_that_pokemon/providers.dart';
 import 'package:whos_that_pokemon/widgets/generation_selector.dart';
+import 'package:whos_that_pokemon/widgets/pokemon_guessed_table.dart';
+import 'package:whos_that_pokemon/widgets/pokemon_search_box.dart';
 import 'package:whos_that_pokemon/widgets/pokemon_type.dart';
 import 'dart:math';
 import 'dart:convert';
@@ -81,9 +84,72 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
     super.dispose();
   }
 
-  final List<Pokemon> pkmnGuessed = [];
-  Pokemon? pokemonToGuess;
-  PokemonSpecies? pokemonSpecies;
+  _clearData() {
+    final guessedPokemonNotifier = ref.read(guessedPokemonListProvider.notifier);
+    final guessedPokemon = guessedPokemonNotifier.state;
+
+    guessedPokemon.clear();
+    guessedPokemonNotifier.update((state) => guessedPokemon);
+
+    _pokemonGenerator.generatePokemon(ref).then((value) => null);
+  }
+
+  Future<void> _guessPokemon(String name) async {
+    final httpResponse = await http.get(Uri.parse('https://pokeapi.co/api/v2/pokemon/$name'));
+
+    final guessedPokemonNotifier = ref.read(guessedPokemonListProvider.notifier);
+    final guessedPokemon = guessedPokemonNotifier.state;
+
+    guessedPokemon.add(Pokemon.fromHttpBody(httpResponse.body));
+    guessedPokemonNotifier.update((state) => guessedPokemon);
+
+    // if (name.toLowerCase() == pokemonToGuess!.name.toLowerCase()) {
+    //   await _addPokemonToGuessedPokedex(pokemonToGuess!);
+    //   _correctGuess();
+    // } else {
+    //   setState(() {
+    //     if (currentHp > 0) {
+    //       currentHp -= 20;
+
+    //       if (currentHp <= 0) {
+    //         _streakBrokenDialog();
+    //         score = 0;
+    //         widget.correctGuessStreak = 0;
+    //       }
+    //     } else {
+    //       if (widget.correctGuessStreak > 0) {
+    //         _streakBrokenDialog();
+    //       }
+    //       score = 0;
+    //       widget.correctGuessStreak = 0;
+    //     }
+    //   });
+    // }
+
+    setState(() {});
+  }
+
+  _debugPokemon(Pokemon? pokemonToGuess) {
+    return Visibility(
+      visible: !kReleaseMode,
+      child: Column(
+        children: [
+          Text("Pokemon to guess: ${pokemonToGuess?.name ?? "Loading..."}", textAlign: TextAlign.center),
+          if (pokemonToGuess != null)
+            Image.network(
+              pokemonToGuess.shinySpriteImageUrl,
+              width: 100,
+              height: 100,
+            ),
+          ElevatedButton(
+              onPressed: () async {
+                _clearData();
+              },
+              child: const Text("Refresh")),
+        ],
+      ),
+    );
+  }
 
   _mobileLayout(Pokemon? pokemonToGuess) {
     final GlobalKey<ScaffoldState> _key = GlobalKey();
@@ -122,12 +188,9 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
           children: [
             Expanded(
               child: ListView(
-                children: [
-                  const SizedBox(height: 10),
-                  GenerationSelector(
-                    generationMap: generationMap,
-                    db: widget.db,
-                  ),
+                children: const [
+                  SizedBox(height: 10),
+                  GenerationSelector(),
                 ],
               ),
             ),
@@ -135,21 +198,12 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
         ),
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        child: ListView(
+          padding: const EdgeInsets.all(16.0),
           children: [
-            Text("Pokemon to guess: ${pokemonToGuess?.name ?? "Loading..."}"),
-            if (pokemonToGuess != null)
-              Image.network(
-                pokemonToGuess.shinySpriteImageUrl,
-                width: 200,
-                height: 200,
-              ),
-            ElevatedButton(
-                onPressed: () async {
-                  await _pokemonGenerator.generatePokemon(ref);
-                },
-                child: const Text("Refresh")),
+            _debugPokemon(pokemonToGuess),
+            PokemonSearchBox(guessPokemonFunction: _guessPokemon),
+            const PokemonGuessedTable(),
           ],
         ),
       ),
@@ -159,6 +213,19 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
   @override
   Widget build(BuildContext context) {
     final pokemonToGuess = ref.watch(pokemonToGuessProvider);
+
+    ref.listen<Map<String, bool>>(generationMapProvider, (previous, next) {
+      if (previous != next) {
+        _clearData();
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.green,
+            content: Text('Generation map has changed!', style: GoogleFonts.inter(fontSize: 16, color: Colors.white)),
+          ),
+        );
+      }
+    });
 
     return LayoutBuilder(
       builder: (context, constraints) {

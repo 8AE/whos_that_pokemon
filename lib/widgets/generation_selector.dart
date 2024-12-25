@@ -2,22 +2,22 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:whos_that_pokemon/providers.dart';
 import 'package:whos_that_pokemon/whos_that_pokemon.dart';
 import 'package:sembast/sembast.dart';
 
-class GenerationSelector extends StatefulWidget {
-  final Database db;
-  final Map<String, bool> generationMap;
-
-  GenerationSelector({super.key, required this.generationMap, required this.db});
+class GenerationSelector extends ConsumerStatefulWidget {
+  const GenerationSelector({super.key});
 
   @override
-  State<GenerationSelector> createState() => GenerationSelectorMainState();
+  ConsumerState<GenerationSelector> createState() => GenerationSelectorMainState();
 }
 
-class GenerationSelectorMainState extends State<GenerationSelector> {
+class GenerationSelectorMainState extends ConsumerState<GenerationSelector> {
   late Map<String, bool> newGenerationMap;
+  late Map<String, bool> currentGenerationMap;
 
   final Map<String, String> generationLabels = {
     "gen1": "Generation 1",
@@ -34,7 +34,9 @@ class GenerationSelectorMainState extends State<GenerationSelector> {
   @override
   void initState() {
     super.initState();
-    newGenerationMap = Map.from(widget.generationMap);
+
+    currentGenerationMap = ref.read(generationMapProvider.notifier).state;
+    newGenerationMap = Map.from(currentGenerationMap);
   }
 
   @override
@@ -43,7 +45,7 @@ class GenerationSelectorMainState extends State<GenerationSelector> {
   }
 
   bool _selectionHasChanged() {
-    return !newGenerationMap.entries.every((element) => element.value == widget.generationMap[element.key]);
+    return !newGenerationMap.entries.every((element) => element.value == currentGenerationMap[element.key]);
   }
 
   Future<void> _showMyDialog() async {
@@ -64,12 +66,8 @@ class GenerationSelectorMainState extends State<GenerationSelector> {
             TextButton(
               child: Text('Change Generations', style: GoogleFonts.inter(color: Colors.purpleAccent)),
               onPressed: () {
+                ref.read(generationMapProvider.notifier).update((state) => newGenerationMap);
                 Navigator.of(context).pop();
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (context) => WhosThatPokemon(newGenerationMap, 0, widget.db),
-                  ),
-                );
               },
             ),
           ],
@@ -110,6 +108,8 @@ class GenerationSelectorMainState extends State<GenerationSelector> {
 
   @override
   Widget build(BuildContext context) {
+    currentGenerationMap = ref.watch(generationMapProvider);
+
     return SizedBox(
       width: 300,
       child: Container(
@@ -135,19 +135,19 @@ class GenerationSelectorMainState extends State<GenerationSelector> {
                 ListView(
                   shrinkWrap: true,
                   physics: NeverScrollableScrollPhysics(),
-                  children: widget.generationMap.keys.map((generation) {
+                  children: currentGenerationMap.keys.map((generation) {
                     return Container(
                       decoration: BoxDecoration(
                         border: Border(
                           top: BorderSide(
                             color: Colors.grey,
-                            width: widget.generationMap.keys.first == generation ? 1.0 : 0.7,
+                            width: currentGenerationMap.keys.first == generation ? 1.0 : 0.7,
                           ),
                           left: BorderSide(color: Colors.grey, width: 1.0),
                           right: BorderSide(color: Colors.grey, width: 1.0),
                           bottom: BorderSide(
                             color: Colors.grey,
-                            width: widget.generationMap.keys.last == generation ? 1.0 : 0.7,
+                            width: currentGenerationMap.keys.last == generation ? 1.0 : 0.7,
                           ),
                         ),
                       ),

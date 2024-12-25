@@ -997,10 +997,7 @@ class _WhosThatPokemonMainState extends ConsumerState<WhosThatPokemon> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        GenerationSelector(
-                          generationMap: generationMap,
-                          db: widget.db,
-                        ),
+                        const GenerationSelector(),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
@@ -1061,10 +1058,7 @@ class _WhosThatPokemonMainState extends ConsumerState<WhosThatPokemon> {
                   const SizedBox(height: 10),
                   _itemBag(),
                   const SizedBox(height: 10),
-                  GenerationSelector(
-                    generationMap: generationMap,
-                    db: widget.db,
-                  ),
+                  const GenerationSelector(),
                 ],
               ),
             ),

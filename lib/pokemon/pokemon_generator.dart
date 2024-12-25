@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -38,6 +39,28 @@ class PokemonGenerator {
     return generationMap.entries.where((entry) => entry.value).map((entry) => entry.key).toList();
   }
 
+  Future<List<String>> _generatePokemonListWithGen(String generation) async {
+    var pokemonListRaw = await http.get(Uri.parse(
+        'https://pokeapi.co/api/v2/pokemon?limit=${_generationUpper[generation]! - _generationLower[generation]!}&offset=${_generationLower[generation]}'));
+    var jsonData = jsonDecode(pokemonListRaw.body);
+    List<String> pkmnList = [];
+
+    for (var pokemonEntry in jsonData['results']) {
+      pkmnList.add(pokemonEntry['name']);
+    }
+
+    return pkmnList;
+  }
+
+  Future<List<String>> _generatePokemonList(WidgetRef ref) async {
+    List<String> pkmnList = [];
+    for (var generation in filteredGenList(ref)) {
+      pkmnList.addAll(await _generatePokemonListWithGen(generation));
+    }
+
+    return pkmnList;
+  }
+
   Future<http.Response> _getRandomPokemonRawFromGeneration(String generation) {
     var intValue = _generationLower[generation]! + Random().nextInt((_generationUpper[generation]! + 1) - _generationLower[generation]!);
 
@@ -56,5 +79,10 @@ class PokemonGenerator {
 
     Pokemon randomPokemon = Pokemon.fromHttpBody(data.body);
     ref.read(pokemonToGuessProvider.notifier).update((state) => randomPokemon);
+
+    var pokemonList = ref.read(pokemonNameListProvider);
+    pokemonList.clear();
+    pokemonList.addAll(await _generatePokemonList(ref));
+    ref.read(pokemonNameListProvider.notifier).update((state) => pokemonList);
   }
 }
