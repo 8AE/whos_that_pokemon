@@ -13,10 +13,15 @@ import 'package:whos_that_pokemon/items/usable_item.dart';
 import 'package:whos_that_pokemon/pokemon.dart';
 import 'package:whos_that_pokemon/pokemon/pokemon_generator.dart';
 import 'package:whos_that_pokemon/providers.dart';
+import 'package:whos_that_pokemon/widgets/current_hp_bar.dart';
+import 'package:whos_that_pokemon/widgets/current_xp_bar.dart';
 import 'package:whos_that_pokemon/widgets/generation_selector.dart';
 import 'package:whos_that_pokemon/widgets/pokemon_guessed_table.dart';
+import 'package:whos_that_pokemon/widgets/pokemon_info.dart';
 import 'package:whos_that_pokemon/widgets/pokemon_search_box.dart';
 import 'package:sembast/sembast.dart';
+import 'package:whos_that_pokemon/widgets/pokemon_stat_box.dart';
+import 'package:whos_that_pokemon/widgets/pokemon_stat_table.dart';
 
 // ignore: must_be_immutable
 class GameScreen extends ConsumerStatefulWidget {
@@ -43,13 +48,6 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
   bool _showInfo = true;
   bool _showGen = false;
   bool _showPokedexNumber = false;
-
-  final _tierBoundry = {
-    0: "Pokeball",
-    10: "Great Ball",
-    25: "Ultra Ball",
-    40: "Master Ball",
-  };
 
   _GameScreenMainState();
 
@@ -97,6 +95,19 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
     );
   }
 
+  _addPokemonToGuessedPokedex(Pokemon pokemon) async {
+    var store = intMapStoreFactory.store('pokedex');
+    var finder = Finder(filter: Filter.equals('pokemon', pokemon.toString()));
+    var recordSnapshots = await store.find(widget.db, finder: finder);
+
+    if (recordSnapshots.isEmpty) {
+      await store.add(widget.db, {'pokemon': pokemon.toString()});
+    } else if (pokemon.isShiny) {
+      var record = recordSnapshots.first;
+      await store.record(record.key).put(widget.db, {'pokemon': pokemon.toString()});
+    }
+  }
+
   Future<void> _guessPokemon(String name) async {
     final httpResponse = await http.get(Uri.parse('https://pokeapi.co/api/v2/pokemon/$name'));
 
@@ -108,6 +119,7 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
     final pokemonToGuess = ref.read(pokemonToGuessProvider);
 
     if (name.toLowerCase() == pokemonToGuess!.name.toLowerCase()) {
+      await _addPokemonToGuessedPokedex(pokemonToGuess);
       GauntletSystem.correctGuess(ref);
       _correctGuessDialog();
       await _pokemonGenerator.generatePokemon(ref);
@@ -135,12 +147,13 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
                 _clearData();
               },
               child: const Text("Refresh")),
+          const SizedBox(height: 10),
         ],
       ),
     );
   }
 
-  _mobileLayout(Pokemon? pokemonToGuess) {
+  _mobileLayout(Pokemon? pokemonToGuess, int correctGuessStreak, int currentScore) {
     final GlobalKey<ScaffoldState> _key = GlobalKey();
 
     return Scaffold(
@@ -152,7 +165,7 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
             textAlign: TextAlign.left,
             text: TextSpan(
               style: GoogleFonts.inter(
-                fontSize: 16,
+                fontSize: 20,
                 color: Colors.white,
               ),
               children: const [
@@ -178,8 +191,10 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
             Expanded(
               child: ListView(
                 children: const [
+                  PokemonStatBox(),
                   SizedBox(height: 10),
                   GenerationSelector(),
+                  SizedBox(height: 10),
                 ],
               ),
             ),
@@ -191,6 +206,35 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
           padding: const EdgeInsets.all(16.0),
           children: [
             _debugPokemon(pokemonToGuess),
+            Align(
+              alignment: Alignment.center,
+              child: Text(
+                "Correct Guess Streak: ${correctGuessStreak.toString()}",
+                style: GoogleFonts.inter(
+                  fontSize: 16,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            const SizedBox(height: 5),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "Score: $currentScore",
+                style: GoogleFonts.inter(
+                  fontSize: 16,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            const CurrentHpBar(),
+            const CurrentXpBar(),
+            const SizedBox(height: 10),
+            Visibility(
+              visible: pokemonToGuess != null,
+              child: const PokemonInfo(),
+            ),
+            const SizedBox(height: 10),
             PokemonSearchBox(guessPokemonFunction: _guessPokemon),
             const PokemonGuessedTable(),
           ],
@@ -202,6 +246,8 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
   @override
   Widget build(BuildContext context) {
     final pokemonToGuess = ref.watch(pokemonToGuessProvider);
+    final correctGuessStreak = ref.watch(correctGuessStreakProvider);
+    final currentScore = ref.watch(currentScoreProvider);
 
     ref.listen<Map<String, bool>>(generationMapProvider, (previous, next) {
       if (previous != next) {
@@ -225,7 +271,7 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        return _mobileLayout(pokemonToGuess);
+        return _mobileLayout(pokemonToGuess, correctGuessStreak, currentScore);
       },
     );
   }

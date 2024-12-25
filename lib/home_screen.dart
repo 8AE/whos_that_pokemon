@@ -232,7 +232,7 @@ class _HomeScreenMainState extends State<HomeScreen> {
                     ),
                     _pokedexButton(),
                     const SizedBox(
-                      height: 5,
+                      height: 10,
                     ),
                     _changelogButton(),
                   ],
