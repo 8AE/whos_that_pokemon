@@ -19,7 +19,7 @@ class GauntletSystem {
     currentScore += gainedScore;
 
     final currentXpNotifier = ref.read(currentXpProvider.notifier);
-    var currentXp = currentScoreNotifier.state;
+    var currentXp = currentXpNotifier.state;
     currentXp = (currentXp + gainedScore);
 
     if (currentXp >= 10) {
