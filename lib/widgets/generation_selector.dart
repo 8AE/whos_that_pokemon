@@ -1,12 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:whos_that_pokemon/providers.dart';
-import 'package:whos_that_pokemon/whos_that_pokemon.dart';
-import 'package:sembast/sembast.dart';
 
 class GenerationSelector extends ConsumerStatefulWidget {
   const GenerationSelector({super.key});
@@ -121,7 +118,7 @@ class GenerationSelectorMainState extends ConsumerState<GenerationSelector> {
           borderRadius: BorderRadius.circular(12.0),
         ),
         child: Padding(
-            padding: EdgeInsets.all(10),
+            padding: const EdgeInsets.all(10),
             child: Column(
               children: [
                 Text(
@@ -134,7 +131,7 @@ class GenerationSelectorMainState extends ConsumerState<GenerationSelector> {
                 const SizedBox(height: 10),
                 ListView(
                   shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
+                  physics: const NeverScrollableScrollPhysics(),
                   children: currentGenerationMap.keys.map((generation) {
                     return Container(
                       decoration: BoxDecoration(
@@ -143,8 +140,8 @@ class GenerationSelectorMainState extends ConsumerState<GenerationSelector> {
                             color: Colors.grey,
                             width: currentGenerationMap.keys.first == generation ? 1.0 : 0.7,
                           ),
-                          left: BorderSide(color: Colors.grey, width: 1.0),
-                          right: BorderSide(color: Colors.grey, width: 1.0),
+                          left: const BorderSide(color: Colors.grey, width: 1.0),
+                          right: const BorderSide(color: Colors.grey, width: 1.0),
                           bottom: BorderSide(
                             color: Colors.grey,
                             width: currentGenerationMap.keys.last == generation ? 1.0 : 0.7,

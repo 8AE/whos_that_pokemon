@@ -125,7 +125,7 @@ class PokemonStatTable extends ConsumerWidget {
                   children: [
                     const TextSpan(text: 'Total: '),
                     TextSpan(
-                      text: '${pkmData!.hp + pkmData.attack + pkmData.defense + pkmData.specialAttack + pkmData.specialDefense + pkmData.speed}',
+                      text: '${pkmData.hp + pkmData.attack + pkmData.defense + pkmData.specialAttack + pkmData.specialDefense + pkmData.speed}',
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ],

@@ -8,7 +8,6 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:whos_that_pokemon/change_log_screen.dart';
 import 'package:whos_that_pokemon/pokedex.dart';
 import 'package:whos_that_pokemon/screens/game_screen.dart';
-import 'package:whos_that_pokemon/whos_that_pokemon.dart';
 import 'package:sembast/sembast.dart';
 
 class HomeScreen extends StatefulWidget {

@@ -19,7 +19,7 @@ class PokemonInfo extends ConsumerWidget {
       children: [
         const PokemonStatTable(),
         const SizedBox(height: 5),
-        PokemonType(pokemonToGuess!.type1, pokemonToGuess!.type2),
+        PokemonType(pokemonToGuess!.type1, pokemonToGuess.type2),
         const SizedBox(height: 5),
         Visibility(
           visible: showGen,
