@@ -1,7 +1,12 @@
 
 ## Version 1.1.6
 
-- performance improvement s
+## General Changes
+- switched state management to riverpod
+- shiny pokemon now have a glowing box when found
+
+## Gauntlet Adjustments
+- 40 HP is now gained after each correct pokemon guess instead of going to max
 
 ## Version 1.1.5
 

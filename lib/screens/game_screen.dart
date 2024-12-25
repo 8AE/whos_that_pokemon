@@ -1,9 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:whos_that_pokemon/gauntlet/gauntlet_correct_guess.dart';
+import 'package:whos_that_pokemon/gauntlet/gauntlet_system.dart';
 import 'package:whos_that_pokemon/items/generation_detector.dart';
 import 'package:whos_that_pokemon/items/pokedex_scope.dart';
 import 'package:whos_that_pokemon/items/potion.dart';
@@ -11,30 +12,23 @@ import 'package:whos_that_pokemon/items/super_potion.dart';
 import 'package:whos_that_pokemon/items/usable_item.dart';
 import 'package:whos_that_pokemon/pokemon.dart';
 import 'package:whos_that_pokemon/pokemon/pokemon_generator.dart';
-import 'package:whos_that_pokemon/pokemon_species.dart';
 import 'package:whos_that_pokemon/providers.dart';
 import 'package:whos_that_pokemon/widgets/generation_selector.dart';
 import 'package:whos_that_pokemon/widgets/pokemon_guessed_table.dart';
 import 'package:whos_that_pokemon/widgets/pokemon_search_box.dart';
-import 'package:whos_that_pokemon/widgets/pokemon_type.dart';
-import 'dart:math';
-import 'dart:convert';
 import 'package:sembast/sembast.dart';
 
 // ignore: must_be_immutable
 class GameScreen extends ConsumerStatefulWidget {
   final Database db;
-  late final Map<String, bool> generationMap;
-  int correctGuessStreak;
 
-  GameScreen(this.generationMap, this.correctGuessStreak, this.db, {super.key});
+  GameScreen(this.db, {super.key});
 
   @override
-  ConsumerState<GameScreen> createState() => _GameScreenMainState(generationMap);
+  ConsumerState<GameScreen> createState() => _GameScreenMainState();
 }
 
 class _GameScreenMainState extends ConsumerState<GameScreen> {
-  final Map<String, bool> generationMap;
   late final PokemonGenerator _pokemonGenerator;
 
   List<UsableItem> items = [];
@@ -46,20 +40,9 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
     PokedexScope(),
   ];
 
-  int currentHp = 100;
-  int currentXp = 0;
-  int score = 0;
   bool _showInfo = true;
   bool _showGen = false;
   bool _showPokedexNumber = false;
-
-  final _currentGuessesToPointsGained = {
-    1: 5,
-    2: 4,
-    3: 3,
-    4: 2,
-    5: 1,
-  };
 
   final _tierBoundry = {
     0: "Pokeball",
@@ -68,7 +51,7 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
     40: "Master Ball",
   };
 
-  _GameScreenMainState(this.generationMap);
+  _GameScreenMainState();
 
   @override
   void initState() {
@@ -94,39 +77,43 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
     _pokemonGenerator.generatePokemon(ref).then((value) => null);
   }
 
+  _correctGuessDialog() {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return const GauntletCorrectGuess();
+      },
+    );
+  }
+
+  _gameOverDialog() {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return const GauntletCorrectGuess();
+      },
+    );
+  }
+
   Future<void> _guessPokemon(String name) async {
     final httpResponse = await http.get(Uri.parse('https://pokeapi.co/api/v2/pokemon/$name'));
 
     final guessedPokemonNotifier = ref.read(guessedPokemonListProvider.notifier);
     final guessedPokemon = guessedPokemonNotifier.state;
-
     guessedPokemon.add(Pokemon.fromHttpBody(httpResponse.body));
     guessedPokemonNotifier.update((state) => guessedPokemon);
 
-    // if (name.toLowerCase() == pokemonToGuess!.name.toLowerCase()) {
-    //   await _addPokemonToGuessedPokedex(pokemonToGuess!);
-    //   _correctGuess();
-    // } else {
-    //   setState(() {
-    //     if (currentHp > 0) {
-    //       currentHp -= 20;
+    final pokemonToGuess = ref.read(pokemonToGuessProvider);
 
-    //       if (currentHp <= 0) {
-    //         _streakBrokenDialog();
-    //         score = 0;
-    //         widget.correctGuessStreak = 0;
-    //       }
-    //     } else {
-    //       if (widget.correctGuessStreak > 0) {
-    //         _streakBrokenDialog();
-    //       }
-    //       score = 0;
-    //       widget.correctGuessStreak = 0;
-    //     }
-    //   });
-    // }
-
-    setState(() {});
+    if (name.toLowerCase() == pokemonToGuess!.name.toLowerCase()) {
+      GauntletSystem.correctGuess(ref);
+      _correctGuessDialog();
+      await _pokemonGenerator.generatePokemon(ref);
+    } else {
+      GauntletSystem.wrongGuess(ref);
+    }
   }
 
   _debugPokemon(Pokemon? pokemonToGuess) {
@@ -224,6 +211,13 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
             content: Text('Generation map has changed!', style: GoogleFonts.inter(fontSize: 16, color: Colors.white)),
           ),
         );
+      }
+    });
+
+    ref.listen<bool>(gameOverProvider, (previous, next) {
+      if (next) {
+        _gameOverDialog();
+        GauntletSystem.resetSystem(ref);
       }
     });
 

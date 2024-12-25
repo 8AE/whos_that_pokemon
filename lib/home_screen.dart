@@ -77,7 +77,7 @@ class _HomeScreenMainState extends State<HomeScreen> {
           } else {
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => GameScreen(generationMap, 0, widget.db),
+                builder: (context) => GameScreen(widget.db),
               ),
             );
           }
@@ -206,21 +206,20 @@ class _HomeScreenMainState extends State<HomeScreen> {
                         }
                       },
                     ),
-                    const SizedBox(
-                      height: 20,
-                    ),
+                    const SizedBox(height: 20),
                     _dailyButton(),
-                    const SizedBox(
-                      height: 10,
-                    ),
+                    const SizedBox(height: 10),
                     _gauntletButton(),
-                    const SizedBox(
-                      height: 10,
+                    Visibility(
+                      visible: false,
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 10),
+                          _onlineButton(),
+                        ],
+                      ),
                     ),
-                    _onlineButton(),
-                    const SizedBox(
-                      height: 5,
-                    ),
+                    const SizedBox(height: 5),
                     const SizedBox(
                       width: 200,
                       child: Divider(

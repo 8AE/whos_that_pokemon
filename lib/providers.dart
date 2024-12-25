@@ -20,3 +20,10 @@ final generationMapProvider = StateProvider<Map<String, bool>>((ref) {
 final guessedPokemonListProvider = StateProvider<List<Pokemon>>((ref) => []);
 
 final pokemonNameListProvider = StateProvider<List<String>>((ref) => []);
+
+final currentHealthProvider = StateProvider<int>((ref) => 100);
+final currentXpProvider = StateProvider<int>((ref) => 0);
+final currentScoreProvider = StateProvider<int>((ref) => 0);
+final correctGuessStreakProvider = StateProvider<int>((ref) => 0);
+
+final gameOverProvider = StateProvider<bool>((ref) => false);
