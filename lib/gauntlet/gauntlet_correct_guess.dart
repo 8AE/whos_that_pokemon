@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:whos_that_pokemon/pokemon/pokemon_generator.dart';
 import 'package:whos_that_pokemon/providers.dart';
 
 class GauntletCorrectGuess extends ConsumerWidget {
@@ -26,9 +27,11 @@ class GauntletCorrectGuess extends ConsumerWidget {
       ),
       actions: <Widget>[
         TextButton(
-          child: Text('Close', style: GoogleFonts.inter(color: Colors.purpleAccent)),
-          onPressed: () {
+          child: Text('Next Pokemon', style: GoogleFonts.inter(color: Colors.purpleAccent)),
+          onPressed: () async {
             Navigator.of(context).pop();
+            ref.read(correctGuessProvider.notifier).update((state) => false);
+            await PokemonGenerator.generatePokemon(ref);
           },
         ),
       ],

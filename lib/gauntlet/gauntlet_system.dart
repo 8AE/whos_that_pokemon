@@ -18,6 +18,16 @@ class GauntletSystem {
 
     currentScore += gainedScore;
 
+    final currentXpNotifier = ref.read(currentXpProvider.notifier);
+    var currentXp = currentScoreNotifier.state;
+    currentXp = (currentXp + gainedScore);
+
+    if (currentXp >= 10) {
+      currentXp = currentXp - 10;
+      ref.read(gainItemProvider.notifier).update((state) => true);
+    }
+
+    currentXpNotifier.update((state) => currentXp);
     currentScoreNotifier.update((state) => currentScore);
 
     final correctGuessStreakNotifier = ref.read(correctGuessStreakProvider.notifier);
@@ -37,6 +47,11 @@ class GauntletSystem {
 
     currentHealth = (currentHealth + 40).clamp(0, 100);
     currentHealthNotifier.update((state) => currentHealth);
+
+    ref.read(showGenerationHintProvider.notifier).update((state) => false);
+    ref.read(showPokedexNumberHintProvider.notifier).update((state) => false);
+
+    ref.read(correctGuessProvider.notifier).update((state) => true);
   }
 
   static void wrongGuess(WidgetRef ref) {
@@ -73,5 +88,11 @@ class GauntletSystem {
 
     final gameOverNotifier = ref.read(gameOverProvider.notifier);
     gameOverNotifier.update((state) => false);
+
+    ref.read(showGenerationHintProvider.notifier).update((state) => false);
+    ref.read(showPokedexNumberHintProvider.notifier).update((state) => false);
+    ref.read(gainItemProvider.notifier).update((state) => false);
+    ref.read(correctGuessProvider.notifier).update((state) => false);
+    ref.read(itemListProvider.notifier).update((state) => []);
   }
 }

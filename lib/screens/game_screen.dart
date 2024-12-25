@@ -4,24 +4,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:whos_that_pokemon/gauntlet/gauntlet_correct_guess.dart';
+import 'package:whos_that_pokemon/gauntlet/gauntlet_select_item.dart';
 import 'package:whos_that_pokemon/gauntlet/gauntlet_system.dart';
-import 'package:whos_that_pokemon/items/generation_detector.dart';
-import 'package:whos_that_pokemon/items/pokedex_scope.dart';
-import 'package:whos_that_pokemon/items/potion.dart';
-import 'package:whos_that_pokemon/items/super_potion.dart';
-import 'package:whos_that_pokemon/items/usable_item.dart';
 import 'package:whos_that_pokemon/pokemon.dart';
 import 'package:whos_that_pokemon/pokemon/pokemon_generator.dart';
+import 'package:whos_that_pokemon/pokemon_species.dart';
 import 'package:whos_that_pokemon/providers.dart';
 import 'package:whos_that_pokemon/widgets/current_hp_bar.dart';
 import 'package:whos_that_pokemon/widgets/current_xp_bar.dart';
 import 'package:whos_that_pokemon/widgets/generation_selector.dart';
+import 'package:whos_that_pokemon/widgets/item_bag.dart';
 import 'package:whos_that_pokemon/widgets/pokemon_guessed_table.dart';
 import 'package:whos_that_pokemon/widgets/pokemon_info.dart';
 import 'package:whos_that_pokemon/widgets/pokemon_search_box.dart';
 import 'package:sembast/sembast.dart';
 import 'package:whos_that_pokemon/widgets/pokemon_stat_box.dart';
-import 'package:whos_that_pokemon/widgets/pokemon_stat_table.dart';
 
 // ignore: must_be_immutable
 class GameScreen extends ConsumerStatefulWidget {
@@ -34,30 +31,13 @@ class GameScreen extends ConsumerStatefulWidget {
 }
 
 class _GameScreenMainState extends ConsumerState<GameScreen> {
-  late final PokemonGenerator _pokemonGenerator;
-
-  List<UsableItem> items = [];
-
-  List<UsableItem> itemsToAdd = [
-    Potion(),
-    SuperPotion(),
-    GenerationDetector(),
-    PokedexScope(),
-  ];
-
-  bool _showInfo = true;
-  bool _showGen = false;
-  bool _showPokedexNumber = false;
-
   _GameScreenMainState();
 
   @override
   void initState() {
     super.initState();
-    _pokemonGenerator = PokemonGenerator();
 
-    _pokemonGenerator.generatePokemon(ref);
-    items.addAll(itemsToAdd);
+    PokemonGenerator.generatePokemon(ref).then((value) => null);
   }
 
   @override
@@ -72,13 +52,13 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
     guessedPokemon.clear();
     guessedPokemonNotifier.update((state) => guessedPokemon);
 
-    _pokemonGenerator.generatePokemon(ref).then((value) => null);
+    PokemonGenerator.generatePokemon(ref).then((value) => null);
   }
 
   _correctGuessDialog() {
     return showDialog<void>(
       context: context,
-      barrierDismissible: true,
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return const GauntletCorrectGuess();
       },
@@ -88,9 +68,19 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
   _gameOverDialog() {
     return showDialog<void>(
       context: context,
-      barrierDismissible: true,
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return const GauntletCorrectGuess();
+      },
+    );
+  }
+
+  _gainItemDialog() {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return const GauntLetGetItem();
       },
     );
   }
@@ -121,8 +111,6 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
     if (name.toLowerCase() == pokemonToGuess!.name.toLowerCase()) {
       await _addPokemonToGuessedPokedex(pokemonToGuess);
       GauntletSystem.correctGuess(ref);
-      _correctGuessDialog();
-      await _pokemonGenerator.generatePokemon(ref);
     } else {
       GauntletSystem.wrongGuess(ref);
     }
@@ -153,7 +141,7 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
     );
   }
 
-  _mobileLayout(Pokemon? pokemonToGuess, int correctGuessStreak, int currentScore) {
+  _mobileLayout(Pokemon? pokemonToGuess, int correctGuessStreak, int currentScore, PokemonSpecies? pokemonSpecies) {
     final GlobalKey<ScaffoldState> _key = GlobalKey();
 
     return Scaffold(
@@ -193,6 +181,8 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
                 children: const [
                   PokemonStatBox(),
                   SizedBox(height: 10),
+                  ItemBag(),
+                  SizedBox(height: 10),
                   GenerationSelector(),
                   SizedBox(height: 10),
                 ],
@@ -231,7 +221,7 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
             const CurrentXpBar(),
             const SizedBox(height: 10),
             Visibility(
-              visible: pokemonToGuess != null,
+              visible: pokemonToGuess != null && pokemonSpecies != null,
               child: const PokemonInfo(),
             ),
             const SizedBox(height: 10),
@@ -246,6 +236,7 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
   @override
   Widget build(BuildContext context) {
     final pokemonToGuess = ref.watch(pokemonToGuessProvider);
+    final pokemonSpecies = ref.watch(pokemonSpeciesProvider);
     final correctGuessStreak = ref.watch(correctGuessStreakProvider);
     final currentScore = ref.watch(currentScoreProvider);
 
@@ -269,9 +260,21 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
       }
     });
 
+    ref.listen<bool>(correctGuessProvider, (previous, next) {
+      if (next) {
+        _correctGuessDialog();
+      }
+    });
+
+    ref.listen<bool>(gainItemProvider, (previous, next) {
+      if (next) {
+        _gainItemDialog();
+      }
+    });
+
     return LayoutBuilder(
       builder: (context, constraints) {
-        return _mobileLayout(pokemonToGuess, correctGuessStreak, currentScore);
+        return _mobileLayout(pokemonToGuess, correctGuessStreak, currentScore, pokemonSpecies);
       },
     );
   }

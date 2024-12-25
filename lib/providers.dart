@@ -1,7 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:whos_that_pokemon/items/usable_item.dart';
 import 'package:whos_that_pokemon/pokemon.dart';
+import 'package:whos_that_pokemon/pokemon_species.dart';
 
 final pokemonToGuessProvider = StateProvider<Pokemon?>((ref) => null);
+final pokemonSpeciesProvider = StateProvider<PokemonSpecies?>((ref) => null);
 
 final generationMapProvider = StateProvider<Map<String, bool>>((ref) {
   return {
@@ -27,3 +30,11 @@ final currentScoreProvider = StateProvider<int>((ref) => 0);
 final correctGuessStreakProvider = StateProvider<int>((ref) => 0);
 
 final gameOverProvider = StateProvider<bool>((ref) => false);
+final gainItemProvider = StateProvider<bool>((ref) => false);
+final correctGuessProvider = StateProvider<bool>((ref) => false);
+
+final itemListProvider = StateProvider<List<UsableItem>>((ref) => []);
+
+final guessingBoxIsFocusedProvider = StateProvider<bool>((ref) => false);
+final showGenerationHintProvider = StateProvider<bool>((ref) => false);
+final showPokedexNumberHintProvider = StateProvider<bool>((ref) => false);
