@@ -1,15 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:whos_that_pokemon/providers.dart';
 
-final _currentGuessesToPointsGained = {
-  1: 5,
-  2: 4,
-  3: 3,
-  4: 2,
-  5: 1,
-};
-
 class GauntletSystem {
+  static const _currentGuessesToPointsGained = {
+    1: 5,
+    2: 4,
+    3: 3,
+    4: 2,
+    5: 1,
+  };
   static void correctGuess(WidgetRef ref) {
     final pokemonGuessed = ref.read(guessedPokemonListProvider);
     final gainedScore = _currentGuessesToPointsGained[pokemonGuessed.length] ?? 0;

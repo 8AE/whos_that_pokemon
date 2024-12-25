@@ -114,6 +114,8 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
     } else {
       GauntletSystem.wrongGuess(ref);
     }
+
+    setState(() {});
   }
 
   _debugPokemon(Pokemon? pokemonToGuess) {
