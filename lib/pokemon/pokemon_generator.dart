@@ -77,9 +77,9 @@ class PokemonGenerator {
     }
 
     Pokemon randomPokemon = Pokemon.fromHttpBody(data.body);
-    ref.read(pokemonToGuessProvider.notifier).update((state) => randomPokemon);
-
     final pokemonSpecies = await PokemonSpecies.create(randomPokemon.id);
+
+    ref.read(pokemonToGuessProvider.notifier).update((state) => randomPokemon);
     ref.read(pokemonSpeciesProvider.notifier).update((state) => pokemonSpecies);
 
     var pokemonList = ref.read(pokemonNameListProvider);

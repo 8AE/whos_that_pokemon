@@ -29,9 +29,9 @@ class GauntletCorrectGuess extends ConsumerWidget {
         TextButton(
           child: Text('Next Pokemon', style: GoogleFonts.inter(color: Colors.purpleAccent)),
           onPressed: () async {
-            Navigator.of(context).pop();
-            ref.read(correctGuessProvider.notifier).update((state) => false);
             await PokemonGenerator.generatePokemon(ref);
+            ref.read(correctGuessProvider.notifier).update((state) => false);
+            Navigator.of(context).pop();
           },
         ),
       ],

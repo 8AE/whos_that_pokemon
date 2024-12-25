@@ -35,7 +35,7 @@ class PokemonInfo extends ConsumerWidget {
         Visibility(
           visible: showPokedexNumber,
           child: Text(
-            'Pokedex Number: ${pokemonSpecies!.id}',
+            'Pokedex Number: ${pokemonSpecies.id}',
             style: GoogleFonts.inter(
               fontSize: 16,
               color: Colors.white,
