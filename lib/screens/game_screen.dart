@@ -249,7 +249,7 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
             textAlign: TextAlign.left,
             text: TextSpan(
               style: GoogleFonts.inter(
-                fontSize: 20,
+                fontSize: 40,
                 color: Colors.white,
               ),
               children: const [
@@ -280,9 +280,6 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
                 // padding: const EdgeInsets.all(16.0),
                 children: [
                   _debugPokemon(pokemonToGuess),
-                  const CurrentHpBar(),
-                  const CurrentXpBar(),
-                  const SizedBox(height: 10),
                   Visibility(
                     visible: pokemonToGuess != null && pokemonSpecies != null,
                     child: const PokemonInfo(),
