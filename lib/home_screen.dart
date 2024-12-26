@@ -7,7 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:whos_that_pokemon/change_log_screen.dart';
 import 'package:whos_that_pokemon/pokedex.dart';
-import 'package:whos_that_pokemon/whos_that_pokemon.dart';
+import 'package:whos_that_pokemon/screens/game_screen.dart';
 import 'package:sembast/sembast.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -30,7 +30,6 @@ class _HomeScreenMainState extends State<HomeScreen> {
     super.dispose();
   }
 
-  List<List<bool>> isSelectedBoolList = List.generate(9, (_) => [true]);
   Map<String, bool> generationMap = {
     "gen1": true,
     "gen2": true,
@@ -77,7 +76,7 @@ class _HomeScreenMainState extends State<HomeScreen> {
           } else {
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => WhosThatPokemon(generationMap, 0, widget.db),
+                builder: (context) => GameScreen(widget.db),
               ),
             );
           }
@@ -206,21 +205,20 @@ class _HomeScreenMainState extends State<HomeScreen> {
                         }
                       },
                     ),
-                    const SizedBox(
-                      height: 20,
-                    ),
+                    const SizedBox(height: 20),
                     _dailyButton(),
-                    const SizedBox(
-                      height: 10,
-                    ),
+                    const SizedBox(height: 10),
                     _gauntletButton(),
-                    const SizedBox(
-                      height: 10,
+                    Visibility(
+                      visible: false,
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 10),
+                          _onlineButton(),
+                        ],
+                      ),
                     ),
-                    _onlineButton(),
-                    const SizedBox(
-                      height: 5,
-                    ),
+                    const SizedBox(height: 5),
                     const SizedBox(
                       width: 200,
                       child: Divider(
@@ -233,7 +231,7 @@ class _HomeScreenMainState extends State<HomeScreen> {
                     ),
                     _pokedexButton(),
                     const SizedBox(
-                      height: 5,
+                      height: 10,
                     ),
                     _changelogButton(),
                   ],
