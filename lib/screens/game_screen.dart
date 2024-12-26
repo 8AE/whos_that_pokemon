@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:whos_that_pokemon/gauntlet/gauntlet_correct_guess.dart';
 import 'package:whos_that_pokemon/gauntlet/gauntlet_select_item.dart';
 import 'package:whos_that_pokemon/gauntlet/gauntlet_system.dart';
+import 'package:whos_that_pokemon/gauntlet/gauntlet_wrong_guess.dart';
 import 'package:whos_that_pokemon/pokemon.dart';
 import 'package:whos_that_pokemon/pokemon/pokemon_generator.dart';
 import 'package:whos_that_pokemon/pokemon_species.dart';
@@ -38,6 +39,9 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
     super.initState();
 
     PokemonGenerator.generatePokemon(ref).then((value) => null);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      GauntletSystem.resetSystem(ref);
+    });
   }
 
   @override
@@ -70,7 +74,7 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return const GauntletCorrectGuess();
+        return const GauntletWrongGuess();
       },
     );
   }
@@ -141,7 +145,7 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
     );
   }
 
-  _mobileLayout(Pokemon? pokemonToGuess, int correctGuessStreak, int currentScore, PokemonSpecies? pokemonSpecies) {
+  _mobileLayout(Pokemon? pokemonToGuess, int correctGuessStreak, int currentScore, PokemonSpecies? pokemonSpecies, bool searchBoxIsFocused) {
     final GlobalKey<ScaffoldState> _key = GlobalKey();
 
     return Scaffold(
@@ -221,7 +225,7 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
             const CurrentXpBar(),
             const SizedBox(height: 10),
             Visibility(
-              visible: pokemonToGuess != null && pokemonSpecies != null,
+              visible: pokemonToGuess != null && pokemonSpecies != null && !searchBoxIsFocused,
               child: const PokemonInfo(),
             ),
             const SizedBox(height: 10),
@@ -239,15 +243,19 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
     final pokemonSpecies = ref.watch(pokemonSpeciesProvider);
     final correctGuessStreak = ref.watch(correctGuessStreakProvider);
     final currentScore = ref.watch(currentScoreProvider);
+    final searchBoxIsFocused = ref.watch(guessingBoxIsFocusedProvider);
 
     ref.listen<Map<String, bool>>(generationMapProvider, (previous, next) {
       if (previous != next) {
-        _clearData();
+        setState(() {
+          GauntletSystem.resetSystem(ref);
+          PokemonGenerator.generatePokemon(ref).then((value) => null);
+        });
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            backgroundColor: Colors.green,
-            content: Text('Generation map has changed!', style: GoogleFonts.inter(fontSize: 16, color: Colors.white)),
+            backgroundColor: Colors.purpleAccent,
+            content: Text('Game Reset', style: GoogleFonts.inter(fontSize: 16, color: Colors.white)),
           ),
         );
       }
@@ -274,7 +282,7 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        return _mobileLayout(pokemonToGuess, correctGuessStreak, currentScore, pokemonSpecies);
+        return _mobileLayout(pokemonToGuess, correctGuessStreak, currentScore, pokemonSpecies, searchBoxIsFocused);
       },
     );
   }

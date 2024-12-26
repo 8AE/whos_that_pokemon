@@ -15,6 +15,24 @@ class PokemonStatBox extends ConsumerWidget {
     40: "Master Ball",
   };
 
+  _giveupButton(WidgetRef ref) {
+    return SizedBox(
+      width: 110,
+      child: OutlinedButton(
+        style: OutlinedButton.styleFrom(
+          side: const BorderSide(color: Colors.purpleAccent),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+        ),
+        onPressed: () {
+          ref.read(gameOverProvider.notifier).update((state) => true);
+        },
+        child: Text("Give Up", style: GoogleFonts.inter(color: Colors.white)),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final pkmnGuessed = ref.watch(guessedPokemonListProvider);
@@ -104,7 +122,7 @@ class PokemonStatBox extends ConsumerWidget {
                 child: CurrentXpBar(),
               ),
               const SizedBox(height: 5),
-              // _giveupButton(),
+              _giveupButton(ref),
             ],
           ),
         ),
