@@ -87,4 +87,25 @@ class PokemonGenerator {
     pokemonList.addAll(await _generatePokemonList(ref));
     ref.read(pokemonNameListProvider.notifier).update((state) => pokemonList);
   }
+
+  static Future<void> generateDailyPokemon(WidgetRef ref) async {
+    var now = DateTime.now();
+    var dailyPokemonNumber = (now.month * 31 + now.day) % 1025 + 1;
+    var data = await http.get(Uri.parse('https://pokeapi.co/api/v2/pokemon/$dailyPokemonNumber'));
+
+    Pokemon randomPokemon = Pokemon.fromHttpBody(data.body);
+    final pokemonSpecies = await PokemonSpecies.create(randomPokemon.id);
+
+    ref.read(pokemonToGuessProvider.notifier).update((state) => randomPokemon);
+    ref.read(pokemonSpeciesProvider.notifier).update((state) => pokemonSpecies);
+
+    ref.read(generationMapProvider.notifier).update((state) {
+      return state.map((key, value) => MapEntry(key, true));
+    });
+
+    var pokemonList = ref.read(pokemonNameListProvider);
+    pokemonList.clear();
+    pokemonList.addAll(await _generatePokemonList(ref));
+    ref.read(pokemonNameListProvider.notifier).update((state) => pokemonList);
+  }
 }
