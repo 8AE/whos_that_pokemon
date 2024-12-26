@@ -21,12 +21,12 @@ class _PokedexMainState extends State<Pokedex> {
 
     var store = intMapStoreFactory.store('pokedex');
 
-    List<Pokemon> newList = [];
+    // List<Pokemon> newList = [];
     store.find(widget.db).then((records) {
       for (var record in records) {
         var pokemonData = record.value['pokemon'] as String;
         try {
-          newList.add(Pokemon.fromString(pokemonData));
+          pokemonList.add(Pokemon.fromString(pokemonData));
         } catch (e) {
           continue;
         }
@@ -34,7 +34,7 @@ class _PokedexMainState extends State<Pokedex> {
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
         setState(() {
-          pokemonList = List.from(newList);
+          // pokemonList = List.from(newList);
         });
       });
     });

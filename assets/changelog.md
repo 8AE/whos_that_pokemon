@@ -3,7 +3,7 @@
 
 ## General Changes
 - switched state management to riverpod
-- shiny pokemon now have a glowing box when found
+  - this is a big change, the entire game was remade in the backend, some bugs may appear
 
 ## Gauntlet Adjustments
 - 40 HP is now gained after each correct pokemon guess instead of going to max

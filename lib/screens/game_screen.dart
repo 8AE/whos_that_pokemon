@@ -237,6 +237,76 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
     );
   }
 
+  _desktopLayout(Pokemon? pokemonToGuess, int correctGuessStreak, int currentScore, PokemonSpecies? pokemonSpecies) {
+    final GlobalKey<ScaffoldState> _key = GlobalKey();
+
+    return Scaffold(
+      key: _key,
+      appBar: AppBar(
+        title: Align(
+          alignment: Alignment.centerLeft,
+          child: RichText(
+            textAlign: TextAlign.left,
+            text: TextSpan(
+              style: GoogleFonts.inter(
+                fontSize: 20,
+                color: Colors.white,
+              ),
+              children: const [
+                TextSpan(text: "Who's That "),
+                TextSpan(
+                  text: "Pokémon",
+                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.purpleAccent),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      body: Center(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Column(
+              children: [
+                GenerationSelector(),
+              ],
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                // padding: const EdgeInsets.all(16.0),
+                children: [
+                  _debugPokemon(pokemonToGuess),
+                  const CurrentHpBar(),
+                  const CurrentXpBar(),
+                  const SizedBox(height: 10),
+                  Visibility(
+                    visible: pokemonToGuess != null && pokemonSpecies != null,
+                    child: const PokemonInfo(),
+                  ),
+                  const SizedBox(height: 10),
+                  PokemonSearchBox(guessPokemonFunction: _guessPokemon),
+                  const PokemonGuessedTable(),
+                ],
+              ),
+            ),
+            const SizedBox(width: 10),
+            const Column(
+              children: [
+                PokemonStatBox(),
+                SizedBox(height: 10),
+                ItemBag(),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final pokemonToGuess = ref.watch(pokemonToGuessProvider);
@@ -282,7 +352,11 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        return _mobileLayout(pokemonToGuess, correctGuessStreak, currentScore, pokemonSpecies, searchBoxIsFocused);
+        if (constraints.maxWidth > 900) {
+          return _desktopLayout(pokemonToGuess, correctGuessStreak, currentScore, pokemonSpecies);
+        } else {
+          return _mobileLayout(pokemonToGuess, correctGuessStreak, currentScore, pokemonSpecies, searchBoxIsFocused);
+        }
       },
     );
   }
