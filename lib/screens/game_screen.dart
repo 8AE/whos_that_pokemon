@@ -37,6 +37,7 @@ class GameScreen extends ConsumerStatefulWidget {
 
 class _GameScreenMainState extends ConsumerState<GameScreen> {
   _GameScreenMainState();
+  final GlobalKey<ScaffoldState> _key = GlobalKey();
 
   @override
   void initState() {
@@ -159,8 +160,6 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
   }
 
   _mobileLayout(Pokemon? pokemonToGuess, int correctGuessStreak, int currentScore, PokemonSpecies? pokemonSpecies, bool searchBoxIsFocused) {
-    final GlobalKey<ScaffoldState> _key = GlobalKey();
-
     return Scaffold(
       key: _key,
       appBar: AppBar(
@@ -251,8 +250,6 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
   }
 
   _desktopLayout(Pokemon? pokemonToGuess, int correctGuessStreak, int currentScore, PokemonSpecies? pokemonSpecies) {
-    final GlobalKey<ScaffoldState> _key = GlobalKey();
-
     return Scaffold(
       key: _key,
       appBar: AppBar(
@@ -366,6 +363,10 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
 
       ref.listen<bool>(gameOverProvider, (previous, next) {
         if (next) {
+          if (_key.currentState!.isDrawerOpen) {
+            Navigator.of(context).pop();
+          }
+
           ref.read(gameOverProvider.notifier).update((state) => false);
           _gameOverDialog();
           GauntletSystem.resetSystem(ref);
