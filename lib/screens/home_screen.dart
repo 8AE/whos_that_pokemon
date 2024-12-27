@@ -3,35 +3,23 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:whos_that_pokemon/daily/daily_system.dart';
 import 'package:whos_that_pokemon/game_mode/game_mode.dart';
+import 'package:whos_that_pokemon/pokemon/pokemon_generator.dart';
 import 'package:whos_that_pokemon/screens/change_log_screen.dart';
 import 'package:whos_that_pokemon/screens/pokedex.dart';
 import 'package:whos_that_pokemon/screens/game_screen.dart';
 import 'package:sembast/sembast.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerWidget {
   final Database db;
 
   HomeScreen({super.key, required this.db});
 
-  @override
-  State<HomeScreen> createState() => _HomeScreenMainState();
-}
-
-class _HomeScreenMainState extends State<HomeScreen> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  Future<void> _showMyDialog() async {
+  Future<void> _showMyDialog(BuildContext context) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!
@@ -52,17 +40,31 @@ class _HomeScreenMainState extends State<HomeScreen> {
     );
   }
 
-  _gauntletButton() {
+  _gauntletButton(BuildContext context, WidgetRef ref) {
     return SizedBox(
       width: 200,
       child: OutlinedButton(
         style: OutlinedButton.styleFrom(
           side: const BorderSide(color: Colors.purpleAccent),
         ),
-        onPressed: () {
+        onPressed: () async {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (BuildContext context) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            },
+          );
+
+          DailySystem.resetSystem(ref);
+          await PokemonGenerator.generatePokemon(ref);
+
+          Navigator.of(context).pop(); // Close the loading dialog
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => GameScreen(db: widget.db, gameMode: GameMode.gauntlet),
+              builder: (context) => GameScreen(db: db, gameMode: GameMode.gauntlet),
             ),
           );
         },
@@ -71,17 +73,31 @@ class _HomeScreenMainState extends State<HomeScreen> {
     );
   }
 
-  _dailyButton() {
+  _dailyButton(BuildContext context, WidgetRef ref) {
     return SizedBox(
       width: 200,
       child: OutlinedButton(
         style: OutlinedButton.styleFrom(
           side: const BorderSide(color: Colors.purpleAccent),
         ),
-        onPressed: () {
+        onPressed: () async {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (BuildContext context) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            },
+          );
+
+          DailySystem.resetSystem(ref);
+          await PokemonGenerator.generateDailyPokemon(ref);
+
+          Navigator.of(context).pop(); // Close the loading dialog
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => GameScreen(db: widget.db, gameMode: GameMode.daily),
+              builder: (context) => GameScreen(db: db, gameMode: GameMode.daily),
             ),
           );
         },
@@ -103,7 +119,7 @@ class _HomeScreenMainState extends State<HomeScreen> {
     );
   }
 
-  _pokedexButton() {
+  _pokedexButton(BuildContext context) {
     return SizedBox(
       width: 200,
       child: OutlinedButton(
@@ -113,7 +129,7 @@ class _HomeScreenMainState extends State<HomeScreen> {
         onPressed: () {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => Pokedex(db: widget.db),
+              builder: (context) => Pokedex(db: db),
             ),
           );
         },
@@ -122,7 +138,7 @@ class _HomeScreenMainState extends State<HomeScreen> {
     );
   }
 
-  _changelogButton() {
+  _changelogButton(BuildContext context) {
     return SizedBox(
       width: 200,
       child: OutlinedButton(
@@ -142,7 +158,7 @@ class _HomeScreenMainState extends State<HomeScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       body: Stack(
         children: [
@@ -193,9 +209,9 @@ class _HomeScreenMainState extends State<HomeScreen> {
                       },
                     ),
                     const SizedBox(height: 20),
-                    _dailyButton(),
+                    _dailyButton(context, ref),
                     const SizedBox(height: 10),
-                    _gauntletButton(),
+                    _gauntletButton(context, ref),
                     Visibility(
                       visible: false,
                       child: Column(
@@ -216,11 +232,11 @@ class _HomeScreenMainState extends State<HomeScreen> {
                     const SizedBox(
                       height: 5,
                     ),
-                    _pokedexButton(),
+                    _pokedexButton(context),
                     const SizedBox(
                       height: 10,
                     ),
-                    _changelogButton(),
+                    _changelogButton(context),
                   ],
                 ),
               ),

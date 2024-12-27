@@ -15,85 +15,67 @@ class GauntletSystem {
     final gainedScore = _currentGuessesToPointsGained[pokemonGuessed.length] ?? 0;
 
     final currentScoreNotifier = ref.read(currentScoreProvider.notifier);
-    var currentScore = currentScoreNotifier.state;
-
-    currentScore += gainedScore;
-
     final currentXpNotifier = ref.read(currentXpProvider.notifier);
-    var currentXp = currentXpNotifier.state;
-    currentXp = (currentXp + gainedScore);
-
-    if (currentXp >= 10) {
-      currentXp = currentXp - 10;
-      ref.read(gainItemProvider.notifier).update((state) => true);
-    }
-
-    currentXpNotifier.update((state) => currentXp);
-    currentScoreNotifier.update((state) => currentScore);
-
     final correctGuessStreakNotifier = ref.read(correctGuessStreakProvider.notifier);
-    var correctGuessStreak = correctGuessStreakNotifier.state;
-
-    correctGuessStreak += 1;
-    correctGuessStreakNotifier.update((state) => correctGuessStreak);
-
     final guessedPokemonNotifier = ref.read(guessedPokemonListProvider.notifier);
-    final guessedPokemon = guessedPokemonNotifier.state;
-
-    guessedPokemon.clear();
-    guessedPokemonNotifier.update((state) => guessedPokemon);
-
     final currentHealthNotifier = ref.read(currentHealthProvider.notifier);
-    var currentHealth = currentHealthNotifier.state;
 
-    currentHealth = (currentHealth + 40).clamp(0, 100);
-    currentHealthNotifier.update((state) => currentHealth);
+    currentScoreNotifier.update((state) => state + gainedScore);
+    currentXpNotifier.update((state) {
+      final newXp = state + gainedScore;
+      if (newXp >= 10) {
+        ref.read(gainItemProvider.notifier).update((state) => true);
+        return newXp - 10;
+      }
+      return newXp;
+    });
+    correctGuessStreakNotifier.update((state) => state + 1);
+    guessedPokemonNotifier.update((state) => []);
+    currentHealthNotifier.update((state) => (state + 40).clamp(0, 100));
 
     ref.read(showGenerationHintProvider.notifier).update((state) => false);
     ref.read(showPokedexNumberHintProvider.notifier).update((state) => false);
-
     ref.read(correctGuessProvider.notifier).update((state) => true);
   }
 
   static void wrongGuess(WidgetRef ref) {
     final currentHealthNotifier = ref.read(currentHealthProvider.notifier);
-    var currentHealth = currentHealthNotifier.state;
-
-    currentHealth = (currentHealth - 20).clamp(0, 100);
+    final currentHealth = (currentHealthNotifier.state - 20).clamp(0, 100);
     currentHealthNotifier.update((state) => currentHealth);
 
     if (currentHealth == 0) {
-      final gameOverNotifier = ref.read(gameOverProvider.notifier);
-      gameOverNotifier.update((state) => true);
+      ref.read(gameOverProvider.notifier).update((state) => true);
     }
   }
 
   static void resetSystem(WidgetRef ref) {
-    final guessedPokemonNotifier = ref.read(guessedPokemonListProvider.notifier);
-    final guessedPokemon = guessedPokemonNotifier.state;
+    final providers = [
+      guessedPokemonListProvider,
+      currentHealthProvider,
+      currentXpProvider,
+      currentScoreProvider,
+      correctGuessStreakProvider,
+      gameOverProvider,
+      showGenerationHintProvider,
+      showPokedexNumberHintProvider,
+      gainItemProvider,
+      correctGuessProvider,
+      itemListProvider,
+    ];
 
-    guessedPokemon.clear();
-    guessedPokemonNotifier.update((state) => guessedPokemon);
-
-    final currentHealthNotifier = ref.read(currentHealthProvider.notifier);
-    currentHealthNotifier.update((state) => 100);
-
-    final currentXpNotifier = ref.read(currentXpProvider.notifier);
-    currentXpNotifier.update((state) => 0);
-
-    final currentScoreNotifier = ref.read(currentScoreProvider.notifier);
-    currentScoreNotifier.update((state) => 0);
-
-    final correctGuessStreakNotifier = ref.read(correctGuessStreakProvider.notifier);
-    correctGuessStreakNotifier.update((state) => 0);
-
-    final gameOverNotifier = ref.read(gameOverProvider.notifier);
-    gameOverNotifier.update((state) => false);
-
-    ref.read(showGenerationHintProvider.notifier).update((state) => false);
-    ref.read(showPokedexNumberHintProvider.notifier).update((state) => false);
-    ref.read(gainItemProvider.notifier).update((state) => false);
-    ref.read(correctGuessProvider.notifier).update((state) => false);
-    ref.read(itemListProvider.notifier).update((state) => []);
+    for (var provider in providers) {
+      ref.read(provider.notifier).update((state) {
+        if (provider == guessedPokemonListProvider) return [];
+        if (provider == currentHealthProvider) return 100;
+        if (provider == currentXpProvider || provider == currentScoreProvider || provider == correctGuessStreakProvider) return 0;
+        if (provider == gameOverProvider ||
+            provider == showGenerationHintProvider ||
+            provider == showPokedexNumberHintProvider ||
+            provider == gainItemProvider ||
+            provider == correctGuessProvider) return false;
+        if (provider == itemListProvider) return [];
+        return state;
+      });
+    }
   }
 }

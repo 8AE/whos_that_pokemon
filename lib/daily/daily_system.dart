@@ -9,26 +9,12 @@ class DailySystem {
   static void wrongGuess(WidgetRef ref) {}
 
   static void resetSystem(WidgetRef ref) {
-    final guessedPokemonNotifier = ref.read(guessedPokemonListProvider.notifier);
-    final guessedPokemon = guessedPokemonNotifier.state;
-
-    guessedPokemon.clear();
-    guessedPokemonNotifier.update((state) => guessedPokemon);
-
-    final currentHealthNotifier = ref.read(currentHealthProvider.notifier);
-    currentHealthNotifier.update((state) => 100);
-
-    final currentXpNotifier = ref.read(currentXpProvider.notifier);
-    currentXpNotifier.update((state) => 0);
-
-    final currentScoreNotifier = ref.read(currentScoreProvider.notifier);
-    currentScoreNotifier.update((state) => 0);
-
-    final correctGuessStreakNotifier = ref.read(correctGuessStreakProvider.notifier);
-    correctGuessStreakNotifier.update((state) => 0);
-
-    final gameOverNotifier = ref.read(gameOverProvider.notifier);
-    gameOverNotifier.update((state) => false);
+    ref.read(guessedPokemonListProvider.notifier).update((state) => []);
+    ref.read(currentHealthProvider.notifier).update((state) => 100);
+    ref.read(currentXpProvider.notifier).update((state) => 0);
+    ref.read(currentScoreProvider.notifier).update((state) => 0);
+    ref.read(correctGuessStreakProvider.notifier).update((state) => 0);
+    ref.read(gameOverProvider.notifier).update((state) => false);
     ref.read(showGenerationHintProvider.notifier).update((state) => false);
     ref.read(showPokedexNumberHintProvider.notifier).update((state) => false);
     ref.read(gainItemProvider.notifier).update((state) => false);

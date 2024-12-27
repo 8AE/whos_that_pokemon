@@ -24,44 +24,32 @@ class ItemManager {
     final itemListNotifier = ref.read(itemListProvider.notifier);
     final itemList = itemListNotifier.state;
 
-    final itemLocation = itemList.indexWhere((element) => element.name == item.name);
-
-    itemList.removeAt(itemLocation);
+    itemList.removeWhere((element) => element.name == item.name);
     itemListNotifier.update((state) => itemList);
 
     final currentHpNotifier = ref.read(currentHealthProvider.notifier);
-    var currentHp = currentHpNotifier.state;
-
     final showGenerationHintNotifier = ref.read(showGenerationHintProvider.notifier);
     final showPokedexNumberHintNotifier = ref.read(showPokedexNumberHintProvider.notifier);
 
     switch (item.name) {
       case "Potion":
-        currentHp = (currentHp + 20).clamp(0, 100);
+        currentHpNotifier.update((state) => (state + 20).clamp(0, 100));
         break;
       case "Super Potion":
-        currentHp = (currentHp + 40).clamp(0, 100);
+        currentHpNotifier.update((state) => (state + 40).clamp(0, 100));
         break;
-
       case "Generation Detector":
         showGenerationHintNotifier.update((state) => true);
         break;
-
       case "Pokedex Scope":
         showPokedexNumberHintNotifier.update((state) => true);
         break;
       default:
         break;
     }
-
-    currentHpNotifier.update((state) => currentHp);
   }
 
   static void addItem(WidgetRef ref, UsableItem item) {
-    final itemListNotifier = ref.read(itemListProvider.notifier);
-    final itemList = itemListNotifier.state;
-
-    itemList.add(item);
-    itemListNotifier.update((state) => itemList);
+    ref.read(itemListProvider.notifier).update((state) => [...state, item]);
   }
 }
