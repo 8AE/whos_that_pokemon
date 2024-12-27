@@ -3,8 +3,8 @@ import 'dart:math';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
-import 'package:whos_that_pokemon/pokemon.dart';
-import 'package:whos_that_pokemon/pokemon_species.dart';
+import 'package:whos_that_pokemon/pokemon/pokemon.dart';
+import 'package:whos_that_pokemon/pokemon/pokemon_species.dart';
 import 'package:whos_that_pokemon/providers.dart';
 
 class PokemonGenerator {

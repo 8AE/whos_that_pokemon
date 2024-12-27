@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:whos_that_pokemon/pokemon/pokemon_generator.dart';
 import 'package:whos_that_pokemon/providers.dart';
 
-class GauntletCorrectGuess extends ConsumerWidget {
-  const GauntletCorrectGuess({super.key});
+class DailyCorrectGuess extends ConsumerWidget {
+  const DailyCorrectGuess({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -27,9 +26,13 @@ class GauntletCorrectGuess extends ConsumerWidget {
       ),
       actions: <Widget>[
         TextButton(
-          child: Text('Next Pokemon', style: GoogleFonts.inter(color: Colors.purpleAccent)),
+          child: Text('Share', style: GoogleFonts.inter(color: Colors.blue)),
+          onPressed: () async {},
+        ),
+        TextButton(
+          child: Text('Return to Main Menu', style: GoogleFonts.inter(color: Colors.white)),
           onPressed: () async {
-            await PokemonGenerator.generatePokemon(ref);
+            Navigator.of(context).pop();
             Navigator.of(context).pop();
           },
         ),

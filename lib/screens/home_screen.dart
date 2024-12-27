@@ -5,8 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:whos_that_pokemon/change_log_screen.dart';
-import 'package:whos_that_pokemon/pokedex.dart';
+import 'package:whos_that_pokemon/game_mode/game_mode.dart';
+import 'package:whos_that_pokemon/screens/change_log_screen.dart';
+import 'package:whos_that_pokemon/screens/pokedex.dart';
 import 'package:whos_that_pokemon/screens/game_screen.dart';
 import 'package:sembast/sembast.dart';
 
@@ -29,18 +30,6 @@ class _HomeScreenMainState extends State<HomeScreen> {
   void dispose() {
     super.dispose();
   }
-
-  Map<String, bool> generationMap = {
-    "gen1": true,
-    "gen2": true,
-    "gen3": true,
-    "gen4": true,
-    "gen5": true,
-    "gen6": true,
-    "gen7": true,
-    "gen8": true,
-    "gen9": true,
-  };
 
   Future<void> _showMyDialog() async {
     return showDialog<void>(
@@ -71,15 +60,11 @@ class _HomeScreenMainState extends State<HomeScreen> {
           side: const BorderSide(color: Colors.purpleAccent),
         ),
         onPressed: () {
-          if (generationMap.values.every((element) => element == false)) {
-            _showMyDialog();
-          } else {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => GameScreen(widget.db),
-              ),
-            );
-          }
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => GameScreen(db: widget.db, gameMode: GameMode.gauntlet),
+            ),
+          );
         },
         child: Text("Gauntlet", style: GoogleFonts.inter(color: Colors.white)),
       ),
@@ -91,10 +76,16 @@ class _HomeScreenMainState extends State<HomeScreen> {
       width: 200,
       child: OutlinedButton(
         style: OutlinedButton.styleFrom(
-          side: const BorderSide(color: Colors.grey),
+          side: const BorderSide(color: Colors.purpleAccent),
         ),
-        onPressed: null,
-        child: Text("Daily", style: GoogleFonts.inter(color: Colors.grey)),
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => GameScreen(db: widget.db, gameMode: GameMode.daily),
+            ),
+          );
+        },
+        child: Text("Daily", style: GoogleFonts.inter(color: Colors.white)),
       ),
     );
   }
@@ -120,15 +111,11 @@ class _HomeScreenMainState extends State<HomeScreen> {
           side: const BorderSide(color: Colors.purpleAccent),
         ),
         onPressed: () {
-          if (generationMap.values.every((element) => element == false)) {
-            _showMyDialog();
-          } else {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => Pokedex(db: widget.db),
-              ),
-            );
-          }
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => Pokedex(db: widget.db),
+            ),
+          );
         },
         child: Text("Pokédex", style: GoogleFonts.inter(color: Colors.white)),
       ),

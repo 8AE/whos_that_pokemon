@@ -9,6 +9,7 @@ class GauntletSystem {
     4: 2,
     5: 1,
   };
+
   static void correctGuess(WidgetRef ref) {
     final pokemonGuessed = ref.read(guessedPokemonListProvider);
     final gainedScore = _currentGuessesToPointsGained[pokemonGuessed.length] ?? 0;

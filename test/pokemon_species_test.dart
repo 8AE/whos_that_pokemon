@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
-import 'package:whos_that_pokemon/pokemon_species.dart';
+import 'package:whos_that_pokemon/pokemon/pokemon_species.dart';
 
 import 'pokemon_species_test.mocks.dart';
 

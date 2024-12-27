@@ -3,13 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:whos_that_pokemon/daily/daily_correct_guess.dart';
+import 'package:whos_that_pokemon/daily/daily_system.dart';
+import 'package:whos_that_pokemon/game_mode/game_mode.dart';
 import 'package:whos_that_pokemon/gauntlet/gauntlet_correct_guess.dart';
 import 'package:whos_that_pokemon/gauntlet/gauntlet_select_item.dart';
 import 'package:whos_that_pokemon/gauntlet/gauntlet_system.dart';
 import 'package:whos_that_pokemon/gauntlet/gauntlet_wrong_guess.dart';
-import 'package:whos_that_pokemon/pokemon.dart';
+import 'package:whos_that_pokemon/pokemon/pokemon.dart';
 import 'package:whos_that_pokemon/pokemon/pokemon_generator.dart';
-import 'package:whos_that_pokemon/pokemon_species.dart';
+import 'package:whos_that_pokemon/pokemon/pokemon_species.dart';
 import 'package:whos_that_pokemon/providers.dart';
 import 'package:whos_that_pokemon/widgets/current_hp_bar.dart';
 import 'package:whos_that_pokemon/widgets/current_xp_bar.dart';
@@ -24,8 +27,9 @@ import 'package:whos_that_pokemon/widgets/pokemon_stat_box.dart';
 // ignore: must_be_immutable
 class GameScreen extends ConsumerStatefulWidget {
   final Database db;
+  final GameMode gameMode;
 
-  GameScreen(this.db, {super.key});
+  const GameScreen({required this.db, required this.gameMode, super.key});
 
   @override
   ConsumerState<GameScreen> createState() => _GameScreenMainState();
@@ -38,10 +42,17 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
   void initState() {
     super.initState();
 
-    PokemonGenerator.generatePokemon(ref).then((value) => null);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      GauntletSystem.resetSystem(ref);
-    });
+    if (widget.gameMode == GameMode.gauntlet) {
+      PokemonGenerator.generatePokemon(ref).then((value) => null);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        GauntletSystem.resetSystem(ref);
+      });
+    } else {
+      PokemonGenerator.generateDailyPokemon(ref).then((value) => null);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        DailySystem.resetSystem(ref);
+      });
+    }
   }
 
   @override
@@ -49,22 +60,16 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
     super.dispose();
   }
 
-  _clearData() {
-    final guessedPokemonNotifier = ref.read(guessedPokemonListProvider.notifier);
-    final guessedPokemon = guessedPokemonNotifier.state;
-
-    guessedPokemon.clear();
-    guessedPokemonNotifier.update((state) => guessedPokemon);
-
-    PokemonGenerator.generatePokemon(ref).then((value) => null);
-  }
-
   _correctGuessDialog() {
     return showDialog<void>(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return const GauntletCorrectGuess();
+        if (widget.gameMode == GameMode.gauntlet) {
+          return const GauntletCorrectGuess();
+        } else {
+          return const DailyCorrectGuess();
+        }
       },
     );
   }
@@ -114,9 +119,17 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
 
     if (name.toLowerCase() == pokemonToGuess!.name.toLowerCase()) {
       await _addPokemonToGuessedPokedex(pokemonToGuess);
-      GauntletSystem.correctGuess(ref);
+      if (widget.gameMode == GameMode.gauntlet) {
+        GauntletSystem.correctGuess(ref);
+      } else {
+        DailySystem.correctGuess(ref);
+      }
     } else {
-      GauntletSystem.wrongGuess(ref);
+      if (widget.gameMode == GameMode.gauntlet) {
+        GauntletSystem.wrongGuess(ref);
+      } else {
+        DailySystem.wrongGuess(ref);
+      }
     }
 
     setState(() {});
@@ -136,7 +149,7 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
             ),
           ElevatedButton(
               onPressed: () async {
-                _clearData();
+                GauntletSystem.resetSystem(ref);
               },
               child: const Text("Refresh")),
           const SizedBox(height: 10),
@@ -268,10 +281,21 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
           mainAxisAlignment: MainAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Column(
-              children: [
-                GenerationSelector(),
-              ],
+            Visibility(
+              visible: widget.gameMode == GameMode.gauntlet,
+              child: const Column(
+                children: [
+                  GenerationSelector(),
+                ],
+              ),
+            ),
+            Visibility(
+              visible: widget.gameMode == GameMode.daily,
+              child: const Column(
+                children: [
+                  SizedBox(width: 300),
+                ],
+              ),
             ),
             const SizedBox(width: 10),
             Expanded(
@@ -291,12 +315,23 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
               ),
             ),
             const SizedBox(width: 10),
-            const Column(
-              children: [
-                PokemonStatBox(),
-                SizedBox(height: 10),
-                ItemBag(),
-              ],
+            Visibility(
+              visible: widget.gameMode == GameMode.gauntlet,
+              child: const Column(
+                children: [
+                  PokemonStatBox(),
+                  SizedBox(height: 10),
+                  ItemBag(),
+                ],
+              ),
+            ),
+            Visibility(
+              visible: widget.gameMode == GameMode.daily,
+              child: const Column(
+                children: [
+                  SizedBox(width: 300),
+                ],
+              ),
             ),
           ],
         ),
@@ -312,38 +347,43 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
     final currentScore = ref.watch(currentScoreProvider);
     final searchBoxIsFocused = ref.watch(guessingBoxIsFocusedProvider);
 
-    ref.listen<Map<String, bool>>(generationMapProvider, (previous, next) {
-      if (previous != next) {
-        setState(() {
+    if (widget.gameMode == GameMode.gauntlet) {
+      ref.listen<Map<String, bool>>(generationMapProvider, (previous, next) {
+        if (previous != next) {
+          setState(() {
+            GauntletSystem.resetSystem(ref);
+            PokemonGenerator.generatePokemon(ref).then((value) => null);
+          });
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: Colors.purpleAccent,
+              content: Text('Game Reset', style: GoogleFonts.inter(fontSize: 16, color: Colors.white)),
+            ),
+          );
+        }
+      });
+
+      ref.listen<bool>(gameOverProvider, (previous, next) {
+        if (next) {
+          ref.read(gameOverProvider.notifier).update((state) => false);
+          _gameOverDialog();
           GauntletSystem.resetSystem(ref);
-          PokemonGenerator.generatePokemon(ref).then((value) => null);
-        });
+        }
+      });
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: Colors.purpleAccent,
-            content: Text('Game Reset', style: GoogleFonts.inter(fontSize: 16, color: Colors.white)),
-          ),
-        );
-      }
-    });
-
-    ref.listen<bool>(gameOverProvider, (previous, next) {
-      if (next) {
-        _gameOverDialog();
-        GauntletSystem.resetSystem(ref);
-      }
-    });
+      ref.listen<bool>(gainItemProvider, (previous, next) {
+        if (next) {
+          ref.read(gainItemProvider.notifier).update((state) => false);
+          _gainItemDialog();
+        }
+      });
+    }
 
     ref.listen<bool>(correctGuessProvider, (previous, next) {
       if (next) {
+        ref.read(correctGuessProvider.notifier).update((state) => false);
         _correctGuessDialog();
-      }
-    });
-
-    ref.listen<bool>(gainItemProvider, (previous, next) {
-      if (next) {
-        _gainItemDialog();
       }
     });
 

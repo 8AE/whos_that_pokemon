@@ -63,6 +63,5 @@ class ItemManager {
 
     itemList.add(item);
     itemListNotifier.update((state) => itemList);
-    ref.read(gainItemProvider.notifier).update((state) => false);
   }
 }

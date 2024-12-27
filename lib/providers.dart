@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:whos_that_pokemon/items/usable_item.dart';
-import 'package:whos_that_pokemon/pokemon.dart';
-import 'package:whos_that_pokemon/pokemon_species.dart';
+import 'package:whos_that_pokemon/pokemon/pokemon.dart';
+import 'package:whos_that_pokemon/pokemon/pokemon_species.dart';
 
 final pokemonToGuessProvider = StateProvider<Pokemon?>((ref) => null);
 final pokemonSpeciesProvider = StateProvider<PokemonSpecies?>((ref) => null);
