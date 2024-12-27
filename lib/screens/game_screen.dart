@@ -182,31 +182,43 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
             ),
           ),
         ),
-        leading: IconButton(
-          icon: const Icon(Icons.menu),
-          onPressed: () {
-            _key.currentState!.openDrawer();
-          },
-        ),
+        leading: widget.gameMode == GameMode.gauntlet
+            ? IconButton(
+                icon: const Icon(Icons.menu),
+                onPressed: () {
+                  _key.currentState!.openDrawer();
+                },
+              )
+            : null,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.home),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
       ),
-      drawer: Drawer(
-        child: Column(
-          children: [
-            Expanded(
-              child: ListView(
-                children: const [
-                  PokemonStatBox(),
-                  SizedBox(height: 10),
-                  ItemBag(),
-                  SizedBox(height: 10),
-                  GenerationSelector(),
-                  SizedBox(height: 10),
+      drawer: widget.gameMode == GameMode.gauntlet
+          ? Drawer(
+              child: Column(
+                children: [
+                  Expanded(
+                    child: ListView(
+                      children: const [
+                        PokemonStatBox(),
+                        SizedBox(height: 10),
+                        ItemBag(),
+                        SizedBox(height: 10),
+                        GenerationSelector(),
+                        SizedBox(height: 10),
+                      ],
+                    ),
+                  ),
                 ],
               ),
-            ),
-          ],
-        ),
-      ),
+            )
+          : null,
       body: Center(
         child: ListView(
           padding: const EdgeInsets.all(16.0),
