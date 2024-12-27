@@ -47,11 +47,13 @@ class _GameScreenMainState extends ConsumerState<GameScreen> {
       PokemonGenerator.generatePokemon(ref).then((value) => null);
       WidgetsBinding.instance.addPostFrameCallback((_) {
         GauntletSystem.resetSystem(ref);
+        setState(() {});
       });
     } else {
       PokemonGenerator.generateDailyPokemon(ref).then((value) => null);
       WidgetsBinding.instance.addPostFrameCallback((_) {
         DailySystem.resetSystem(ref);
+        setState(() {});
       });
     }
   }

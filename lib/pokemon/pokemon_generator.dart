@@ -89,8 +89,12 @@ class PokemonGenerator {
   }
 
   static Future<void> generateDailyPokemon(WidgetRef ref) async {
+    List<int> numbers = List<int>.generate(1025, (i) => i + 1);
+
     var now = DateTime.now();
-    var dailyPokemonNumber = (now.month * 31 + now.day) % 1025 + 1;
+    numbers.shuffle(Random(now.year));
+
+    var dailyPokemonNumber = numbers[now.month * 31 + now.day];
     var data = await http.get(Uri.parse('https://pokeapi.co/api/v2/pokemon/$dailyPokemonNumber'));
 
     Pokemon randomPokemon = Pokemon.fromHttpBody(data.body);
