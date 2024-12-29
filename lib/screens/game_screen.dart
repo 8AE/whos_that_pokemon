@@ -45,16 +45,33 @@ class GameScreen extends ConsumerWidget {
     }
   }
 
+  Future<void> _addPokemonToDailyGuessList(Database db, Pokemon pokemon) async {
+    var store = intMapStoreFactory.store('daily-pokemon');
+    await store.add(db, {'pokemon': pokemon.toString()});
+  }
+
+  Future<void> _storeSolvedPokemon(Database db, Pokemon pokemon) async {
+    var store = StoreRef.main();
+    await store.record('daily_solved_pokemon').put(db, pokemon.toString());
+    await store.record('daily_solved').put(db, true);
+  }
+
   Future<void> _guessPokemon(BuildContext context, WidgetRef ref, String name) async {
     final httpResponse = await http.get(Uri.parse('https://pokeapi.co/api/v2/pokemon/$name'));
+
+    final guessedPokemon = Pokemon.fromHttpBody(httpResponse.body);
 
     final guessedPokemonNotifier = ref.read(guessedPokemonListProvider.notifier);
     guessedPokemonNotifier.update((state) => [
           ...state,
-          Pokemon.fromHttpBody(httpResponse.body),
+          guessedPokemon,
         ]);
 
     final pokemonToGuess = ref.read(pokemonToGuessProvider);
+
+    if (gameMode == GameMode.daily) {
+      await _addPokemonToDailyGuessList(db, guessedPokemon);
+    }
 
     if (name.toLowerCase() == pokemonToGuess!.name.toLowerCase()) {
       await _addPokemonToGuessedPokedex(db, pokemonToGuess);
@@ -224,7 +241,10 @@ class GameScreen extends ConsumerWidget {
               child: const PokemonInfo(),
             ),
             const SizedBox(height: 10),
-            PokemonSearchBox(guessPokemonFunction: (name) => _guessPokemon(context, ref, name)),
+            Visibility(
+              visible: !ref.read(correctGuessProvider),
+              child: PokemonSearchBox(guessPokemonFunction: (name) => _guessPokemon(context, ref, name)),
+            ),
             const PokemonGuessedTable(),
           ],
         ),
@@ -289,7 +309,22 @@ class GameScreen extends ConsumerWidget {
                     child: const PokemonInfo(),
                   ),
                   const SizedBox(height: 10),
-                  PokemonSearchBox(guessPokemonFunction: (name) => _guessPokemon(context, ref, name)),
+                  Visibility(
+                    visible: !ref.read(correctGuessProvider),
+                    child: PokemonSearchBox(guessPokemonFunction: (name) => _guessPokemon(context, ref, name)),
+                  ),
+                  Visibility(
+                    visible: ref.read(correctGuessProvider) && gameMode == GameMode.daily,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        final guessedPokemonList = ref.read(guessedPokemonListProvider);
+                        final shareText = "I guessed the Daily Pokémon in ${guessedPokemonList.length} tries! Can you beat me?";
+                        // Share.share(shareText);
+                      },
+                      icon: const Icon(Icons.share),
+                      label: const Text("Share"),
+                    ),
+                  ),
                   const PokemonGuessedTable(),
                 ],
               ),
@@ -365,6 +400,10 @@ class GameScreen extends ConsumerWidget {
     ref.listen<bool>(correctGuessProvider, (previous, next) {
       if (next) {
         ref.read(correctGuessProvider.notifier).update((state) => false);
+
+        if (gameMode == GameMode.daily) {
+          _storeSolvedPokemon(db, pokemonToGuess!).then((value) => null);
+        }
         _correctGuessDialog(context);
       }
     });

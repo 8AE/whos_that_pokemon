@@ -8,7 +8,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:whos_that_pokemon/daily/daily_system.dart';
 import 'package:whos_that_pokemon/game_mode/game_mode.dart';
+import 'package:whos_that_pokemon/pokemon/pokemon.dart';
 import 'package:whos_that_pokemon/pokemon/pokemon_generator.dart';
+import 'package:whos_that_pokemon/providers.dart';
 import 'package:whos_that_pokemon/screens/change_log_screen.dart';
 import 'package:whos_that_pokemon/screens/pokedex.dart';
 import 'package:whos_that_pokemon/screens/game_screen.dart';
@@ -73,7 +75,7 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  _dailyButton(BuildContext context, WidgetRef ref) {
+  _dailyButton(BuildContext context, WidgetRef ref, Database db) {
     return SizedBox(
       width: 200,
       child: OutlinedButton(
@@ -92,7 +94,43 @@ class HomeScreen extends ConsumerWidget {
           );
 
           DailySystem.resetSystem(ref);
+
           await PokemonGenerator.generateDailyPokemon(ref);
+
+          var dailyPokemonStorage = intMapStoreFactory.store('daily-pokemon');
+          List<Pokemon> pokemonList = [];
+          dailyPokemonStorage.find(db).then((records) {
+            for (var record in records) {
+              var pokemonData = record.value['pokemon'] as String;
+              try {
+                pokemonList.add(Pokemon.fromString(pokemonData));
+              } catch (e) {
+                continue;
+              }
+            }
+          });
+
+          final guessedPokemonNotifier = ref.read(guessedPokemonListProvider.notifier);
+          guessedPokemonNotifier.update((state) => pokemonList);
+
+          final dailyPokemon = ref.read(pokemonToGuessProvider);
+
+          var mainStorage = StoreRef.main();
+
+          var dailyStoredPokemonRecord = await mainStorage.record('daily_solved_pokemon').get(db);
+          var dailySolvedRecord = await mainStorage.record('daily_solved').get(db);
+
+          if (dailySolvedRecord != null && dailyStoredPokemonRecord != null && dailySolvedRecord as bool) {
+            final dailyStoredPokemon = Pokemon.fromString(dailyStoredPokemonRecord as String);
+            if (dailyStoredPokemon.name != dailyPokemon!.name) {
+              await dailyPokemonStorage.delete(db);
+              guessedPokemonNotifier.update((state) => []);
+              await mainStorage.record('daily_solved').put(db, false);
+            } else {
+              print("object");
+              ref.read(correctGuessProvider.notifier).update((state) => true);
+            }
+          }
 
           Navigator.of(context).pop(); // Close the loading dialog
           Navigator.of(context).push(
@@ -209,7 +247,7 @@ class HomeScreen extends ConsumerWidget {
                       },
                     ),
                     const SizedBox(height: 20),
-                    _dailyButton(context, ref),
+                    _dailyButton(context, ref, db),
                     const SizedBox(height: 10),
                     _gauntletButton(context, ref),
                     Visibility(
