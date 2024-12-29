@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:share_plus/share_plus.dart';
 import 'package:whos_that_pokemon/daily/daily_correct_guess.dart';
 import 'package:whos_that_pokemon/daily/daily_system.dart';
 import 'package:whos_that_pokemon/game_mode/game_mode.dart';
@@ -23,6 +24,7 @@ import 'package:whos_that_pokemon/widgets/pokemon_info.dart';
 import 'package:whos_that_pokemon/widgets/pokemon_search_box.dart';
 import 'package:sembast/sembast.dart';
 import 'package:whos_that_pokemon/widgets/pokemon_stat_box.dart';
+import 'package:whos_that_pokemon/widgets/share_button.dart';
 
 class GameScreen extends ConsumerWidget {
   final Database db;
@@ -245,6 +247,7 @@ class GameScreen extends ConsumerWidget {
               visible: !ref.read(correctGuessProvider),
               child: PokemonSearchBox(guessPokemonFunction: (name) => _guessPokemon(context, ref, name)),
             ),
+            Visibility(visible: ref.read(correctGuessProvider) && gameMode == GameMode.daily, child: const ShareButton()),
             const PokemonGuessedTable(),
           ],
         ),
@@ -313,18 +316,7 @@ class GameScreen extends ConsumerWidget {
                     visible: !ref.read(correctGuessProvider),
                     child: PokemonSearchBox(guessPokemonFunction: (name) => _guessPokemon(context, ref, name)),
                   ),
-                  Visibility(
-                    visible: ref.read(correctGuessProvider) && gameMode == GameMode.daily,
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        final guessedPokemonList = ref.read(guessedPokemonListProvider);
-                        final shareText = "I guessed the Daily Pokémon in ${guessedPokemonList.length} tries! Can you beat me?";
-                        // Share.share(shareText);
-                      },
-                      icon: const Icon(Icons.share),
-                      label: const Text("Share"),
-                    ),
-                  ),
+                  Visibility(visible: ref.read(correctGuessProvider) && gameMode == GameMode.daily, child: const ShareButton()),
                   const PokemonGuessedTable(),
                 ],
               ),

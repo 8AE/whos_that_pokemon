@@ -1,4 +1,13 @@
 
+## Version 1.2.0
+
+## General Changes
+- stat compare is back for each pokemon you guess
+- fixed some bugs which should make the game feel smoother
+
+## Daily Mode
+- daily mode is here! each day a new pokemon will be generated to guess
+
 ## Version 1.1.6
 
 ## General Changes

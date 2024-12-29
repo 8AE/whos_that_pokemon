@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:whos_that_pokemon/providers.dart';
+import 'package:whos_that_pokemon/widgets/share_button.dart';
 
 class DailyCorrectGuess extends ConsumerWidget {
   const DailyCorrectGuess({super.key});
@@ -25,10 +26,7 @@ class DailyCorrectGuess extends ConsumerWidget {
         ),
       ),
       actions: <Widget>[
-        TextButton(
-          child: Text('Share', style: GoogleFonts.inter(color: Colors.blue)),
-          onPressed: () async {},
-        ),
+        const ShareButton(),
         TextButton(
           child: Text('Return to Main Menu', style: GoogleFonts.inter(color: Colors.white)),
           onPressed: () async {
