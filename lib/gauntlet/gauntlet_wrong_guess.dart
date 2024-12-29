@@ -55,8 +55,6 @@ class GauntletWrongGuess extends ConsumerWidget {
           child: Text('Retry', style: GoogleFonts.inter(color: Colors.purpleAccent)),
           onPressed: () async {
             await PokemonGenerator.generatePokemon(ref);
-            ref.read(gameOverProvider.notifier).update((state) => false);
-
             Navigator.of(context).pop();
           },
         ),

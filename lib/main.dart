@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:whos_that_pokemon/home_screen.dart';
+import 'package:whos_that_pokemon/screens/home_screen.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast_web/sembast_web.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

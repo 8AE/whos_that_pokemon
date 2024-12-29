@@ -3,8 +3,8 @@ import 'dart:math';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
-import 'package:whos_that_pokemon/pokemon.dart';
-import 'package:whos_that_pokemon/pokemon_species.dart';
+import 'package:whos_that_pokemon/pokemon/pokemon.dart';
+import 'package:whos_that_pokemon/pokemon/pokemon_species.dart';
 import 'package:whos_that_pokemon/providers.dart';
 
 class PokemonGenerator {
@@ -81,6 +81,31 @@ class PokemonGenerator {
 
     ref.read(pokemonToGuessProvider.notifier).update((state) => randomPokemon);
     ref.read(pokemonSpeciesProvider.notifier).update((state) => pokemonSpecies);
+
+    var pokemonList = ref.read(pokemonNameListProvider);
+    pokemonList.clear();
+    pokemonList.addAll(await _generatePokemonList(ref));
+    ref.read(pokemonNameListProvider.notifier).update((state) => pokemonList);
+  }
+
+  static Future<void> generateDailyPokemon(WidgetRef ref) async {
+    List<int> numbers = List<int>.generate(1025, (i) => i + 1);
+
+    var now = DateTime.now();
+    numbers.shuffle(Random(now.year));
+
+    var dailyPokemonNumber = numbers[now.month * 31 + now.day];
+    var data = await http.get(Uri.parse('https://pokeapi.co/api/v2/pokemon/$dailyPokemonNumber'));
+
+    Pokemon randomPokemon = Pokemon.fromHttpBody(data.body);
+    final pokemonSpecies = await PokemonSpecies.create(randomPokemon.id);
+
+    ref.read(pokemonToGuessProvider.notifier).update((state) => randomPokemon);
+    ref.read(pokemonSpeciesProvider.notifier).update((state) => pokemonSpecies);
+
+    ref.read(generationMapProvider.notifier).update((state) {
+      return state.map((key, value) => MapEntry(key, true));
+    });
 
     var pokemonList = ref.read(pokemonNameListProvider);
     pokemonList.clear();

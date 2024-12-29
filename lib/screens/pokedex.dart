@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:whos_that_pokemon/pokemon.dart';
+import 'package:whos_that_pokemon/pokemon/pokemon.dart';
 import 'package:sembast/sembast.dart';
 
 class Pokedex extends StatefulWidget {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:whos_that_pokemon/daily/stat_compare.dart';
 import 'package:whos_that_pokemon/providers.dart';
 import 'package:whos_that_pokemon/widgets/pokemon_type.dart';
 
@@ -10,6 +11,7 @@ class PokemonGuessedTable extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final guessedPokemonList = ref.watch(guessedPokemonListProvider);
+    final pokemonToGuess = ref.watch(pokemonToGuessProvider);
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -37,15 +39,27 @@ class PokemonGuessedTable extends ConsumerWidget {
             ),
             DataCell(Text(pokemon.name, style: GoogleFonts.inter(color: Colors.white))),
             DataCell(PokemonType(pokemon.type1, pokemon.type2)),
-            DataCell(Text(pokemon.hp.toString(), style: GoogleFonts.inter(color: Colors.white))),
-            DataCell(Text(pokemon.attack.toString(), style: GoogleFonts.inter(color: Colors.white))),
-            DataCell(Text(pokemon.defense.toString(), style: GoogleFonts.inter(color: Colors.white))),
-            DataCell(Text(pokemon.specialAttack.toString(), style: GoogleFonts.inter(color: Colors.white))),
-            DataCell(Text(pokemon.specialDefense.toString(), style: GoogleFonts.inter(color: Colors.white))),
-            DataCell(Text(pokemon.speed.toString(), style: GoogleFonts.inter(color: Colors.white))),
+            DataCell(Text(pokemon.hp.toString(), style: GoogleFonts.inter(color: StatCompare.colorsBasedOnStatDiff(pokemon.hp, pokemonToGuess!.hp)))),
+            DataCell(
+                Text(pokemon.attack.toString(), style: GoogleFonts.inter(color: StatCompare.colorsBasedOnStatDiff(pokemon.attack, pokemonToGuess.attack)))),
+            DataCell(
+                Text(pokemon.defense.toString(), style: GoogleFonts.inter(color: StatCompare.colorsBasedOnStatDiff(pokemon.defense, pokemonToGuess.defense)))),
+            DataCell(Text(pokemon.specialAttack.toString(),
+                style: GoogleFonts.inter(color: StatCompare.colorsBasedOnStatDiff(pokemon.specialAttack, pokemonToGuess.specialAttack)))),
+            DataCell(Text(pokemon.specialDefense.toString(),
+                style: GoogleFonts.inter(color: StatCompare.colorsBasedOnStatDiff(pokemon.specialDefense, pokemonToGuess.specialDefense)))),
+            DataCell(Text(pokemon.speed.toString(), style: GoogleFonts.inter(color: StatCompare.colorsBasedOnStatDiff(pokemon.speed, pokemonToGuess.speed)))),
             DataCell(
               Text((pokemon.hp + pokemon.attack + pokemon.defense + pokemon.specialAttack + pokemon.specialDefense + pokemon.speed).toString(),
-                  style: GoogleFonts.inter(color: Colors.white)),
+                  style: GoogleFonts.inter(
+                      color: StatCompare.colorsBasedOnStatDiff(
+                          pokemon.hp + pokemon.attack + pokemon.defense + pokemon.specialAttack + pokemon.specialDefense + pokemon.speed,
+                          pokemonToGuess.hp +
+                              pokemonToGuess.attack +
+                              pokemonToGuess.defense +
+                              pokemonToGuess.specialAttack +
+                              pokemonToGuess.specialDefense +
+                              pokemonToGuess.speed))),
             ),
           ]);
         }).toList(),
