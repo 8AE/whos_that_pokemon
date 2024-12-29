@@ -127,7 +127,6 @@ class HomeScreen extends ConsumerWidget {
               guessedPokemonNotifier.update((state) => []);
               await mainStorage.record('daily_solved').put(db, false);
             } else {
-              print("object");
               ref.read(correctGuessProvider.notifier).update((state) => true);
             }
           }
